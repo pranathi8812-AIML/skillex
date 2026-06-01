@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+  <div class="auth-card wide-card">
+    <div class="auth-header">
+      <i class="fa-solid fa-pen"></i>
+      <h2>Edit Profile</h2>
+      <p>Update your personal information</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" name="name" value="{{ current_user.name }}" required/>
+      </div>
+      <div class="form-group">
+        <label>Ward / Area</label>
+        <input type="text" name="ward" value="{{ current_user.ward }}" required/>
+      </div>
+      <div class="form-group">
+        <label>Bio <span class="hint">(tell the community about yourself)</span></label>
+        <textarea name="bio" rows="3" placeholder="e.g. I am a retired teacher who loves helping students...">{{ current_user.bio }}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Profile Photo</label>
+        <input type="file" name="photo" accept="image/*"/>
+      </div>
+      <button type="submit" class="btn-primary btn-full">Save Changes</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

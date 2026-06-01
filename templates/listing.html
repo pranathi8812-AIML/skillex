@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}{{ listing.title }}{% endblock %}
+
+{% block content %}
+<section class="listing-detail">
+
+  <div class="listing-detail-card">
+    <div class="listing-detail-top">
+      <span class="badge badge-{{ listing.type }}">{{ listing.type | capitalize }}</span>
+      <span class="badge badge-category">{{ listing.category }}</span>
+      <span class="badge badge-{{ listing.status }}">{{ listing.status | capitalize }}</span>
+    </div>
+
+    <h2>{{ listing.title }}</h2>
+    <p class="listing-desc">{{ listing.description }}</p>
+
+    <div class="listing-info-grid">
+      <div class="info-item">
+        <i class="fa-solid fa-location-dot"></i>
+        <span>{{ listing.ward }}</span>
+      </div>
+      <div class="info-item">
+        <i class="fa-solid fa-coins"></i>
+        <span>{{ listing.credits }} Credits</span>
+      </div>
+      <div class="info-item">
+        <i class="fa-solid fa-calendar"></i>
+        <span>{{ listing.created_at.strftime('%d %b %Y') }}</span>
+      </div>
+    </div>
+
+    <div class="listing-author-card">
+      <i class="fa-solid fa-user-circle fa-2x"></i>
+      <div>
+        <strong>{{ listing.author.name }}</strong>
+        <p>{{ listing.author.ward }}</p>
+        <p><i class="fa-solid fa-coins"></i> {{ listing.author.credits }} credits</p>
+      </div>
+      <a href="{{ url_for('profile', id=listing.author.id) }}" class="btn-outline btn-sm">View Profile</a>
+      <a href="{{ url_for('send_message', receiver_id=listing.author.id) }}" class="btn-outline btn-sm">
+        <i class="fa-solid fa-envelope"></i> Message
+      </a>
+    </div>
+
+    {% if current_user.is_authenticated and current_user.id != listing.user_id and listing.status == 'open' %}
+    <form method="POST" class="exchange-form">
+      <p class="exchange-note">
+        <i class="fa-solid fa-circle-info"></i>
+        This will send an exchange request and reserve <strong>{{ listing.credits }} credits</strong> from your balance.
+      </p>
+      <button type="submit" class="btn-primary btn-full">
+        <i class="fa-solid fa-handshake"></i> Send Exchange Request
+      </button>
+    </form>
+    {% elif not current_user.is_authenticated %}
+    <p class="auth-switch"><a href="{{ url_for('login') }}">Login</a> to send an exchange request.</p>
+    {% endif %}
+  </div>
+
+</section>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Leaderboard{% endblock %}
+
+{% block content %}
+<section class="leaderboard-section">
+  <div class="leaderboard-header">
+    <h2><i class="fa-solid fa-trophy"></i> Community Leaderboard</h2>
+    <p>Top contributors ranked by credits earned</p>
+  </div>
+
+  <div class="leaderboard-table">
+    <div class="lb-row lb-head">
+      <span>Rank</span>
+      <span>Member</span>
+      <span>Ward</span>
+      <span>Credits</span>
+    </div>
+    {% for user in users %}
+    <a href="{{ url_for('profile', id=user.id) }}" class="lb-row {% if loop.index <= 3 %}lb-top{% endif %}">
+      <span class="lb-rank">
+        {% if loop.index == 1 %}<i class="fa-solid fa-trophy gold"></i>
+        {% elif loop.index == 2 %}<i class="fa-solid fa-trophy silver"></i>
+        {% elif loop.index == 3 %}<i class="fa-solid fa-trophy bronze"></i>
+        {% else %}{{ loop.index }}{% endif %}
+      </span>
+      <span class="lb-name">
+        <img src="https://ui-avatars.com/api/?name={{ user.name }}&background=1a1a2e&color=fff&size=36"
+             alt="{{ user.name }}" class="lb-avatar"/>
+        {{ user.name }}
+      </span>
+      <span>{{ user.ward }}</span>
+      <span class="lb-credits"><i class="fa-solid fa-coins"></i> {{ user.credits }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

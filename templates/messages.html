@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+<section class="messages-section">
+  <h2><i class="fa-solid fa-envelope"></i> My Messages</h2>
+
+  {% if messages %}
+  <div class="messages-list">
+    {% for m in messages %}
+    <div class="message-card {% if not m.is_read %}unread{% endif %}">
+      <div class="message-header">
+        <span class="message-sender">
+          <i class="fa-solid fa-user-circle"></i>
+          From: <strong>{{ m.sender_id }}</strong>
+        </span>
+        <span class="message-time">{{ m.sent_at.strftime('%d %b %Y, %I:%M %p') }}</span>
+      </div>
+      <p class="message-body">{{ m.body }}</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="fa-solid fa-envelope-open"></i>
+    <p>No messages yet.</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Send Message{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+  <div class="auth-card">
+    <div class="auth-header">
+      <i class="fa-solid fa-paper-plane"></i>
+      <h2>Send Message</h2>
+      <p>To: <strong>{{ receiver.name }}</strong> — {{ receiver.ward }}</p>
+    </div>
+
+    <form method="POST">
+      <div class="form-group">
+        <label>Your Message</label>
+        <textarea name="body" rows="5" placeholder="Write your message here..." required></textarea>
+      </div>
+      <button type="submit" class="btn-primary btn-full">
+        <i class="fa-solid fa-paper-plane"></i> Send Message
+      </button>
+    </form>
+  </div>
+</section>
+{% endblock %}

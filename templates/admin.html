@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+<section class="admin-section">
+  <h2><i class="fa-solid fa-gear"></i> Admin Panel</h2>
+
+  <div class="admin-stats">
+    <div class="admin-stat-card">
+      <i class="fa-solid fa-users"></i>
+      <h3>{{ users|length }}</h3>
+      <p>Total Users</p>
+    </div>
+    <div class="admin-stat-card">
+      <i class="fa-solid fa-list"></i>
+      <h3>{{ listings|length }}</h3>
+      <p>Total Listings</p>
+    </div>
+    <div class="admin-stat-card">
+      <i class="fa-solid fa-handshake"></i>
+      <h3>{{ exchanges|length }}</h3>
+      <p>Total Exchanges</p>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <h3 class="section-subtitle"><i class="fa-solid fa-users"></i> All Users</h3>
+  <div class="admin-table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th><th>Name</th><th>Email</th><th>Ward</th><th>Credits</th><th>Role</th><th>Joined</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u.id }}</td>
+          <td><a href="{{ url_for('profile', id=u.id) }}">{{ u.name }}</a></td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.ward }}</td>
+          <td><i class="fa-solid fa-coins"></i> {{ u.credits }}</td>
+          <td><span class="badge badge-{{ u.role }}">{{ u.role }}</span></td>
+          <td>{{ u.created_at.strftime('%d %b %Y') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Listings Table -->
+  <h3 class="section-subtitle"><i class="fa-solid fa-list"></i> All Listings</h3>
+  <div class="admin-table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th><th>Title</th><th>Type</th><th>Category</th><th>Ward</th><th>Credits</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for l in listings %}
+        <tr>
+          <td>{{ l.id }}</td>
+          <td><a href="{{ url_for('view_listing', id=l.id) }}">{{ l.title }}</a></td>
+          <td><span class="badge badge-{{ l.type }}">{{ l.type }}</span></td>
+          <td>{{ l.category }}</td>
+          <td>{{ l.ward }}</td>
+          <td>{{ l.credits }}</td>
+          <td><span class="badge badge-{{ l.status }}">{{ l.status }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</section>
+{% endblock %}

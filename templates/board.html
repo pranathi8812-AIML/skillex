@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Skill Board{% endblock %}
+
+{% block content %}
+<section class="board-section">
+
+  <div class="board-header">
+    <h2><i class="fa-solid fa-list-check"></i> Skill Board</h2>
+    <a href="{{ url_for('post_listing') }}" class="btn-primary">+ Post Skill</a>
+  </div>
+
+  <!-- Filters -->
+  <form method="GET" class="filter-bar">
+    <select name="type">
+      <option value="">All Types</option>
+      <option value="offer" {% if type_ == 'offer' %}selected{% endif %}>Offers</option>
+      <option value="request" {% if type_ == 'request' %}selected{% endif %}>Requests</option>
+    </select>
+    <select name="category">
+      <option value="">All Categories</option>
+      {% for cat in ['Education','Home Repair','Cooking','Technology','Health','Arts','Transport','Other'] %}
+      <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>{{ cat }}</option>
+      {% endfor %}
+    </select>
+    <input type="text" name="ward" placeholder="Filter by ward/area" value="{{ ward }}"/>
+    <button type="submit" class="btn-primary">Filter</button>
+    <a href="{{ url_for('board') }}" class="btn-outline">Clear</a>
+  </form>
+
+  <!-- Listings -->
+  {% if listings %}
+  <div class="listing-grid">
+    {% for l in listings %}
+    <a href="{{ url_for('view_listing', id=l.id) }}" class="listing-card">
+      <div class="listing-card-top">
+        <span class="badge badge-{{ l.type }}">{{ l.type | capitalize }}</span>
+        <span class="badge badge-category">{{ l.category }}</span>
+      </div>
+      <h3>{{ l.title }}</h3>
+      <p>{{ l.description[:100] }}{% if l.description|length > 100 %}...{% endif %}</p>
+      <div class="listing-meta">
+        <span><i class="fa-solid fa-location-dot"></i> {{ l.ward }}</span>
+        <span><i class="fa-solid fa-coins"></i> {{ l.credits }} credits</span>
+      </div>
+      <div class="listing-author">
+        <i class="fa-solid fa-user-circle"></i> {{ l.author.name }}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="fa-solid fa-box-open"></i>
+    <p>No listings found. <a href="{{ url_for('post_listing') }}">Be the first to post!</a></p>
+  </div>
+  {% endif %}
+
+</section>
+{% endblock %}

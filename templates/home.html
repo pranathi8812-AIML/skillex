@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-tag"><i class="fa-solid fa-bolt"></i> Community First Platform</div>
+    <h1>Share Skills.<br><span>Earn Credits.</span><br>Build Community.</h1>
+    <p>Skillex connects neighbours to exchange skills — tutoring, repairs, cooking, and more. No money needed, just community trust.</p>
+    <div class="hero-buttons">
+      <a href="{{ url_for('board') }}" class="btn-primary">Browse Skills</a>
+      <a href="{{ url_for('register') }}" class="btn-outline-white">Join Free</a>
+    </div>
+    <div class="hero-badges">
+      <div class="hero-badge"><i class="fa-solid fa-shield-halved"></i> 100% Free</div>
+      <div class="hero-badge"><i class="fa-solid fa-location-dot"></i> Neighbourhood Only</div>
+      <div class="hero-badge"><i class="fa-solid fa-coins"></i> Credit Based</div>
+    </div>
+  </div>
+  <div class="hero-image">
+    <div class="hero-graphic">
+      <i class="fa-solid fa-people-group"></i>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="how-it-works">
+  <h2 class="section-title">How It Works</h2>
+  <p class="section-sub">Four simple steps to start exchanging skills in your neighbourhood</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-icon"><i class="fa-solid fa-user-plus"></i></div>
+      <h3>1. Join</h3>
+      <p>Register with your name, email, and neighbourhood ward. You get 10 free credits to start.</p>
+    </div>
+    <div class="step">
+      <div class="step-icon"><i class="fa-solid fa-list-check"></i></div>
+      <h3>2. Post or Browse</h3>
+      <p>Post a skill you can offer or browse requests from people in your area who need help.</p>
+    </div>
+    <div class="step">
+      <div class="step-icon"><i class="fa-solid fa-handshake"></i></div>
+      <h3>3. Exchange</h3>
+      <p>Agree to help someone and complete the exchange. Credits transfer automatically on completion.</p>
+    </div>
+    <div class="step">
+      <div class="step-icon"><i class="fa-solid fa-star"></i></div>
+      <h3>4. Build Trust</h3>
+      <p>Rate each other after every exchange. Build your community reputation over time.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Categories -->
+<section class="categories">
+  <h2 class="section-title">Skill Categories</h2>
+  <p class="section-sub">Browse skills across 8 everyday categories</p>
+  <div class="category-grid">
+    <a href="{{ url_for('board', category='Education') }}" class="category-card">
+      <i class="fa-solid fa-graduation-cap"></i>
+      <span>Education</span>
+    </a>
+    <a href="{{ url_for('board', category='Home Repair') }}" class="category-card">
+      <i class="fa-solid fa-wrench"></i>
+      <span>Home Repair</span>
+    </a>
+    <a href="{{ url_for('board', category='Cooking') }}" class="category-card">
+      <i class="fa-solid fa-utensils"></i>
+      <span>Cooking</span>
+    </a>
+    <a href="{{ url_for('board', category='Technology') }}" class="category-card">
+      <i class="fa-solid fa-laptop-code"></i>
+      <span>Technology</span>
+    </a>
+    <a href="{{ url_for('board', category='Health') }}" class="category-card">
+      <i class="fa-solid fa-heart-pulse"></i>
+      <span>Health</span>
+    </a>
+    <a href="{{ url_for('board', category='Arts') }}" class="category-card">
+      <i class="fa-solid fa-palette"></i>
+      <span>Arts</span>
+    </a>
+    <a href="{{ url_for('board', category='Transport') }}" class="category-card">
+      <i class="fa-solid fa-car"></i>
+      <span>Transport</span>
+    </a>
+    <a href="{{ url_for('board', category='Other') }}" class="category-card">
+      <i class="fa-solid fa-ellipsis"></i>
+      <span>Other</span>
+    </a>
+  </div>
+</section>
+
+<!-- Latest Listings -->
+<section class="latest">
+  <h2 class="section-title">Latest on the Board</h2>
+  <p class="section-sub">Fresh skill offers and requests from your community</p>
+  {% if listings %}
+  <div class="listing-grid">
+    {% for l in listings %}
+    <a href="{{ url_for('view_listing', id=l.id) }}" class="listing-card">
+      <div class="listing-card-top">
+        <span class="badge badge-{{ l.type }}">{{ l.type | capitalize }}</span>
+        <span class="badge badge-category">{{ l.category }}</span>
+      </div>
+      <h3>{{ l.title }}</h3>
+      <p>{{ l.description[:80] }}{% if l.description|length > 80 %}...{% endif %}</p>
+      <div class="listing-meta">
+        <span><i class="fa-solid fa-location-dot"></i> {{ l.ward }}</span>
+        <span><i class="fa-solid fa-coins"></i> {{ l.credits }} credits</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="empty">No listings yet. <a href="{{ url_for('post_listing') }}">Be the first to post!</a></p>
+  {% endif %}
+  <div class="center-btn">
+    <a href="{{ url_for('board') }}" class="btn-primary">View All Listings</a>
+  </div>
+</section>
+
+<!-- Stats -->
+<section class="stats">
+  <div class="stat">
+    <h2><i class="fa-solid fa-users"></i></h2>
+    <p>Community Members</p>
+  </div>
+  <div class="stat">
+    <h2><i class="fa-solid fa-list"></i></h2>
+    <p>Active Listings</p>
+  </div>
+  <div class="stat">
+    <h2><i class="fa-solid fa-handshake"></i></h2>
+    <p>Exchanges Completed</p>
+  </div>
+  <div class="stat">
+    <h2><i class="fa-solid fa-coins"></i></h2>
+    <p>Credits Circulated</p>
+  </div>
+</section>
+
+{% endblock %}

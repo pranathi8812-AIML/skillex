@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Post a Skill{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+  <div class="auth-card wide-card">
+    <div class="auth-header">
+      <i class="fa-solid fa-plus-circle"></i>
+      <h2>Post a Skill</h2>
+      <p>Offer a skill or request help from your community</p>
+    </div>
+
+    <form method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Type</label>
+          <select name="type" required>
+            <option value="offer">I can Offer this skill</option>
+            <option value="request">I need help (Request)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select name="category" required>
+            {% for cat in ['Education','Home Repair','Cooking','Technology','Health','Arts','Transport','Other'] %}
+            <option value="{{ cat }}">{{ cat }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" name="title" placeholder="e.g. Can teach basic Python programming" required/>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" rows="4" placeholder="Describe what you offer or need in detail..." required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Credits <span class="hint">(how many credits for this exchange)</span></label>
+        <input type="number" name="credits" min="1" max="20" value="2" required/>
+      </div>
+
+      <button type="submit" class="btn-primary btn-full">Post Listing</button>
+    </form>
+  </div>
+</section>
+{% endblock %}
