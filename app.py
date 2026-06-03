@@ -180,9 +180,14 @@ def edit_profile():
 
         file = request.files.get('photo')
         if file and allowed_file(file.filename):
-            filename = secure_filename(f"user_{current_user.id}_{file.filename}")
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            current_user.photo = filename
+            try:
+                filename = secure_filename(f"user_{current_user.id}_{file.filename}")
+                upload_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+                file.save(upload_path)
+                current_user.photo = filename
+            except Exception:
+                pass  # Skip photo upload on read-only filesystems like Vercel
 
         db.session.commit()
         flash('Profile updated!', 'success')
