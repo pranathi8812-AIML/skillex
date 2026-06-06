@@ -7,6 +7,12 @@ from models import db, User, Listing, Exchange, Message, Review, CreditTransacti
 from datetime import datetime
 import os
 
+app = Flask(__name__)
+app.config.from_object(Config)
+
+db.init_app(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
 def get_avatar_url(user):
     seed = user.avatar_seed or user.name
     style = user.avatar_style or 'adventurer'
@@ -14,12 +20,6 @@ def get_avatar_url(user):
 
 app.jinja_env.globals['get_avatar_url'] = get_avatar_url
 
-app = Flask(__name__)
-app.config.from_object(Config)
-
-db.init_app(app)
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
