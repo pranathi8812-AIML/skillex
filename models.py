@@ -12,7 +12,9 @@ class User(UserMixin, db.Model):
     ward = db.Column(db.String(100), nullable=False)
     credits = db.Column(db.Integer, default=10)
     bio = db.Column(db.String(300), default='')
-    photo = db.Column(db.String(200), default='default.png')
+    photo = db.Column(db.String(500), default='')
+avatar_seed = db.Column(db.String(100), default='')
+avatar_style = db.Column(db.String(50), default='adventurer')
     role = db.Column(db.String(20), default='user')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -51,7 +53,8 @@ class Message(db.Model):
     body = db.Column(db.String(1000), nullable=False)
     is_read = db.Column(db.Boolean, default=False)
     sent_at = db.Column(db.DateTime, default=datetime.utcnow)
-
+    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
+    receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_messages')
 
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)

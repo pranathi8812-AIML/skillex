@@ -7,6 +7,13 @@ from models import db, User, Listing, Exchange, Message, Review, CreditTransacti
 from datetime import datetime
 import os
 
+def get_avatar_url(user):
+    seed = user.avatar_seed or user.name
+    style = user.avatar_style or 'adventurer'
+    return f"https://api.dicebear.com/7.x/{style}/svg?seed={seed}"
+
+app.jinja_env.globals['get_avatar_url'] = get_avatar_url
+
 app = Flask(__name__)
 app.config.from_object(Config)
 
@@ -209,23 +216,12 @@ def edit_profile():
         current_user.name = request.form['name']
         current_user.bio = request.form['bio']
         current_user.ward = request.form['ward']
-
-        file = request.files.get('photo')
-        if file and allowed_file(file.filename):
-            try:
-                filename = secure_filename(f"user_{current_user.id}_{file.filename}")
-                upload_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                os.makedirs(os.path.dirname(upload_path), exist_ok=True)
-                file.save(upload_path)
-                current_user.photo = filename
-            except Exception:
-                pass  # Skip photo upload on read-only filesystems like Vercel
-
+        current_user.avatar_seed = request.form.get('avatar_seed', current_user.name)
+        current_user.avatar_style = request.form.get('avatar_style', 'adventurer')
         db.session.commit()
         flash('Profile updated!', 'success')
         return redirect(url_for('profile', id=current_user.id))
     return render_template('edit_profile.html')
-
 # ── Messages ─────────────────────────────────────────────
 @app.route('/messages')
 @login_required

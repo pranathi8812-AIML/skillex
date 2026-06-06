@@ -23,7 +23,7 @@
         <div class="message-header">
           <span class="message-sender">
             <i class="fa-solid fa-user-circle"></i>
-            From: <strong>{{ m.sender_id }}</strong>
+            From: <strong>{{ m.sender.name if m.sender else 'Unknown' }}</strong>
           </span>
           <span class="message-time">{{ m.sent_at.strftime('%d %b %Y, %I:%M %p') }}</span>
         </div>
@@ -47,7 +47,7 @@
         <div class="message-header">
           <span class="message-sender">
             <i class="fa-solid fa-paper-plane"></i>
-            To: <strong>{{ m.receiver_id }}</strong>
+            To: <strong>{{ m.receiver.name if m.receiver else 'Unknown' }}</strong>
           </span>
           <span class="message-time">{{ m.sent_at.strftime('%d %b %Y, %I:%M %p') }}</span>
         </div>

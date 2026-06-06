@@ -7,10 +7,10 @@
     <div class="auth-header">
       <i class="fa-solid fa-pen"></i>
       <h2>Edit Profile</h2>
-      <p>Update your personal information</p>
+      <p>Update your info and pick your avatar</p>
     </div>
 
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" id="profileForm">
       <div class="form-group">
         <label>Full Name</label>
         <input type="text" name="name" value="{{ current_user.name }}" required/>
@@ -20,15 +20,75 @@
         <input type="text" name="ward" value="{{ current_user.ward }}" required/>
       </div>
       <div class="form-group">
-        <label>Bio <span class="hint">(tell the community about yourself)</span></label>
-        <textarea name="bio" rows="3" placeholder="e.g. I am a retired teacher who loves helping students...">{{ current_user.bio }}</textarea>
+        <label>Bio</label>
+        <textarea name="bio" rows="3" placeholder="Tell the community about yourself...">{{ current_user.bio }}</textarea>
       </div>
+
+      <!-- Avatar Generator -->
       <div class="form-group">
-        <label>Profile Photo</label>
-        <input type="file" name="photo" accept="image/*"/>
+        <label>Avatar Style</label>
+        <div class="avatar-styles">
+          <label class="style-option {% if current_user.avatar_style == 'adventurer' %}selected{% endif %}">
+            <input type="radio" name="avatar_style" value="adventurer" {% if current_user.avatar_style == 'adventurer' %}checked{% endif %} onchange="updatePreview()"/>
+            <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=preview" alt="Adventurer"/>
+            <span>Adventurer</span>
+          </label>
+          <label class="style-option {% if current_user.avatar_style == 'adventurer-neutral' %}selected{% endif %}">
+            <input type="radio" name="avatar_style" value="adventurer-neutral" {% if current_user.avatar_style == 'adventurer-neutral' %}checked{% endif %} onchange="updatePreview()"/>
+            <img src="https://api.dicebear.com/7.x/adventurer-neutral/svg?seed=preview" alt="Adventurer Neutral"/>
+            <span>Neutral</span>
+          </label>
+          <label class="style-option {% if current_user.avatar_style == 'fun-emoji' %}selected{% endif %}">
+            <input type="radio" name="avatar_style" value="fun-emoji" {% if current_user.avatar_style == 'fun-emoji' %}checked{% endif %} onchange="updatePreview()"/>
+            <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=preview" alt="Fun Emoji"/>
+            <span>Fun Emoji</span>
+          </label>
+          <label class="style-option {% if current_user.avatar_style == 'lorelei' %}selected{% endif %}">
+            <input type="radio" name="avatar_style" value="lorelei" {% if current_user.avatar_style == 'lorelei' %}checked{% endif %} onchange="updatePreview()"/>
+            <img src="https://api.dicebear.com/7.x/lorelei/svg?seed=preview" alt="Lorelei"/>
+            <span>Lorelei</span>
+          </label>
+          <label class="style-option {% if current_user.avatar_style == 'notionists' %}selected{% endif %}">
+            <input type="radio" name="avatar_style" value="notionists" {% if current_user.avatar_style == 'notionists' %}checked{% endif %} onchange="updatePreview()"/>
+            <img src="https://api.dicebear.com/7.x/notionists/svg?seed=preview" alt="Notionists"/>
+            <span>Notionists</span>
+          </label>
+        </div>
       </div>
-      <button type="submit" class="btn-primary btn-full">Save Changes</button>
+
+      <div class="form-group">
+        <label>Avatar Seed <span class="hint">(change this to generate a different look)</span></label>
+        <input type="text" name="avatar_seed" id="avatarSeed"
+               value="{{ current_user.avatar_seed or current_user.name }}"
+               placeholder="Type anything to change your avatar"
+               oninput="updatePreview()"/>
+      </div>
+
+      <!-- Live Preview -->
+      <div class="avatar-preview-box">
+        <p>Live Preview</p>
+        <img id="avatarPreview" src="" alt="Avatar Preview"/>
+        <small>This is how your avatar will look</small>
+      </div>
+
+      <button type="submit" class="btn-primary btn-full">
+        <i class="fa-solid fa-save"></i> Save Profile
+      </button>
     </form>
   </div>
 </section>
+
+<script>
+function updatePreview() {
+  const seed = document.getElementById('avatarSeed').value || 'default';
+  const style = document.querySelector('input[name="avatar_style"]:checked').value;
+  const preview = document.getElementById('avatarPreview');
+  preview.src = `https://api.dicebear.com/7.x/${style}/svg?seed=${encodeURIComponent(seed)}`;
+
+  document.querySelectorAll('.style-option').forEach(el => el.classList.remove('selected'));
+  document.querySelector(`input[name="avatar_style"]:checked`).parentElement.classList.add('selected');
+}
+// Init on load
+window.onload = updatePreview;
+</script>
 {% endblock %}

@@ -24,8 +24,8 @@
         {% else %}{{ loop.index }}{% endif %}
       </span>
       <span class="lb-name">
-        <img src="https://ui-avatars.com/api/?name={{ user.name }}&background=1a1a2e&color=fff&size=36"
-             alt="{{ user.name }}" class="lb-avatar"/>
+        <img src="{{ get_avatar_url(user) }}" alt="{{ user.name }}" class="lb-avatar"/>
+             
         {{ user.name }}
       </span>
       <span>{{ user.ward }}</span>

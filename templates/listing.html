@@ -5,12 +5,7 @@
 <section class="listing-detail">
 
   <div class="listing-detail-card">
-    <p style="color:yellow;font-size:12px;">
-  DEBUG — logged_in: {{ current_user.is_authenticated }} | 
-  current_user.id: {{ current_user.id if current_user.is_authenticated else 'NOT LOGGED IN' }} | 
-  listing.user_id: {{ listing.user_id }} | 
-  match: {{ current_user.id == listing.user_id if current_user.is_authenticated else 'N/A' }}
-</p>
+    
     <div class="listing-detail-top">
       <span class="badge badge-{{ listing.type }}">{{ listing.type | capitalize }}</span>
       <span class="badge badge-category">{{ listing.category }}</span>
