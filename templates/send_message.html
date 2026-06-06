@@ -1,24 +1,69 @@
 {% extends 'base.html' %}
-{% block title %}Send Message{% endblock %}
+{% block title %}Message {{ receiver.name }}{% endblock %}
 
 {% block content %}
 <section class="auth-section">
-  <div class="auth-card">
+  <div class="auth-card wide-card">
     <div class="auth-header">
       <i class="fa-solid fa-paper-plane"></i>
-      <h2>Send Message</h2>
-      <p>To: <strong>{{ receiver.name }}</strong> — {{ receiver.ward }}</p>
+      <h2>{{ receiver.name }}</h2>
+      <p><i class="fa-solid fa-location-dot"></i> {{ receiver.ward }}</p>
     </div>
 
-    <form method="POST">
-      <div class="form-group">
-        <label>Your Message</label>
-        <textarea name="body" rows="5" placeholder="Write your message here..." required></textarea>
+    {% if can_message %}
+      <!-- Conversation -->
+      {% if conversation %}
+      <div class="conversation-box">
+        {% for m in conversation %}
+        <div class="convo-msg {% if m.sender_id == current_user.id %}convo-sent{% else %}convo-received{% endif %}">
+          <p>{{ m.body }}</p>
+          <small>{{ m.sent_at.strftime('%d %b, %I:%M %p') }}</small>
+        </div>
+        {% endfor %}
       </div>
-      <button type="submit" class="btn-primary btn-full">
-        <i class="fa-solid fa-paper-plane"></i> Send Message
-      </button>
-    </form>
+      {% endif %}
+
+      <!-- Send message -->
+      <form method="POST">
+        <input type="hidden" name="action" value="send_message"/>
+        <div class="form-group">
+          <label>Your Message</label>
+          <textarea name="body" rows="3" placeholder="Write your message..." required></textarea>
+        </div>
+        <button type="submit" class="btn-primary btn-full">
+          <i class="fa-solid fa-paper-plane"></i> Send Message
+        </button>
+      </form>
+
+    {% elif existing_request %}
+      <!-- Request already sent -->
+      <div class="request-status pending-status">
+        <i class="fa-solid fa-clock"></i>
+        <h3>Request Pending</h3>
+        <p>You sent a message request to <strong>{{ receiver.name }}</strong>. Waiting for them to accept.</p>
+      </div>
+
+    {% else %}
+      <!-- Send request -->
+      <div class="request-status">
+        <i class="fa-solid fa-lock"></i>
+        <h3>Send Message Request</h3>
+        <p>You need to send a message request to <strong>{{ receiver.name }}</strong> first. They will need to accept it before you can chat.</p>
+      </div>
+      <form method="POST">
+        <input type="hidden" name="action" value="send_request"/>
+        <button type="submit" class="btn-primary btn-full">
+          <i class="fa-solid fa-paper-plane"></i> Send Message Request
+        </button>
+      </form>
+
+    {% endif %}
+
+    <div style="text-align:center; margin-top:1rem;">
+      <a href="{{ url_for('profile', id=receiver.id) }}" class="btn-outline btn-sm">
+        View Profile
+      </a>
+    </div>
   </div>
 </section>
 {% endblock %}

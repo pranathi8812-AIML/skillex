@@ -3,7 +3,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from config import Config
-from models import db, User, Listing, Exchange, Message, Review, CreditTransaction
+from models import db, User, Listing, Exchange, Message, Review, CreditTransaction, MessageRequest
 from datetime import datetime
 import os
 
@@ -119,6 +119,38 @@ def post_listing():
         return redirect(url_for('board'))
     return render_template('post_listing.html')
 
+# ── Edit Listing ─────────────────────────────────────────
+@app.route('/listing/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_listing(id):
+    listing = db.session.get(Listing, id)
+    if not listing or listing.user_id != current_user.id:
+        flash('You can only edit your own listings.', 'danger')
+        return redirect(url_for('board'))
+    if request.method == 'POST':
+        listing.type = request.form['type']
+        listing.category = request.form['category']
+        listing.title = request.form['title']
+        listing.description = request.form['description']
+        listing.credits = int(request.form['credits'])
+        db.session.commit()
+        flash('Listing updated successfully!', 'success')
+        return redirect(url_for('view_listing', id=listing.id))
+    return render_template('edit_listing.html', listing=listing)
+
+# ── Delete Listing ────────────────────────────────────────
+@app.route('/listing/<int:id>/delete')
+@login_required
+def delete_listing(id):
+    listing = db.session.get(Listing, id)
+    if not listing or listing.user_id != current_user.id:
+        flash('You can only delete your own listings.', 'danger')
+        return redirect(url_for('board'))
+    db.session.delete(listing)
+    db.session.commit()
+    flash('Listing deleted successfully.', 'success')
+    return redirect(url_for('dashboard'))
+
 # ── View Listing & Send Exchange Request ────────────────
 @app.route('/listing/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -199,19 +231,103 @@ def edit_profile():
 @login_required
 def messages():
     received = Message.query.filter_by(receiver_id=current_user.id).order_by(Message.sent_at.desc()).all()
-    return render_template('messages.html', messages=received)
+    sent = Message.query.filter_by(sender_id=current_user.id).order_by(Message.sent_at.desc()).all()
+    return render_template('messages.html', messages=received, sent=sent)
 
 @app.route('/messages/send/<int:receiver_id>', methods=['GET', 'POST'])
 @login_required
 def send_message(receiver_id):
-    receiver = db.session.get(User, receiver_id)
-    if request.method == 'POST':
-        msg = Message(sender_id=current_user.id, receiver_id=receiver_id, body=request.form['body'])
-        db.session.add(msg)
-        db.session.commit()
-        flash('Message sent!', 'success')
+    # Block messaging yourself
+    if receiver_id == current_user.id:
+        flash('You cannot send a message to yourself.', 'danger')
         return redirect(url_for('messages'))
-    return render_template('send_message.html', receiver=receiver)
+
+    receiver = db.session.get(User, receiver_id)
+    if not receiver:
+        flash('User not found.', 'danger')
+        return redirect(url_for('messages'))
+
+    # Check if request is accepted or if current user already sent a request
+    existing = MessageRequest.query.filter_by(
+        sender_id=current_user.id, receiver_id=receiver_id
+    ).first()
+    accepted = MessageRequest.query.filter_by(
+        sender_id=current_user.id, receiver_id=receiver_id, status='accepted'
+    ).first()
+    # Also check reverse — if receiver sent accepted request to current user
+    reverse_accepted = MessageRequest.query.filter_by(
+        sender_id=receiver_id, receiver_id=current_user.id, status='accepted'
+    ).first()
+
+    can_message = accepted or reverse_accepted
+
+    if request.method == 'POST':
+        action = request.form.get('action')
+
+        if action == 'send_request':
+            if existing:
+                flash('Message request already sent. Wait for acceptance.', 'danger')
+            else:
+                msg_request = MessageRequest(
+                    sender_id=current_user.id,
+                    receiver_id=receiver_id
+                )
+                db.session.add(msg_request)
+                db.session.commit()
+                flash('Message request sent!', 'success')
+            return redirect(url_for('send_message', receiver_id=receiver_id))
+
+        if action == 'send_message':
+            if not can_message:
+                flash('Request not accepted yet.', 'danger')
+                return redirect(url_for('send_message', receiver_id=receiver_id))
+            msg = Message(
+                sender_id=current_user.id,
+                receiver_id=receiver_id,
+                body=request.form['body']
+            )
+            db.session.add(msg)
+            db.session.commit()
+            flash('Message sent!', 'success')
+            return redirect(url_for('messages'))
+
+    # Load conversation if accepted
+    conversation = []
+    if can_message:
+        conversation = Message.query.filter(
+            ((Message.sender_id == current_user.id) & (Message.receiver_id == receiver_id)) |
+            ((Message.sender_id == receiver_id) & (Message.receiver_id == current_user.id))
+        ).order_by(Message.sent_at.asc()).all()
+
+    return render_template('send_message.html',
+        receiver=receiver,
+        existing_request=existing,
+        can_message=can_message,
+        conversation=conversation
+    )
+
+@app.route('/messages/requests')
+@login_required
+def message_requests():
+    requests_received = MessageRequest.query.filter_by(
+        receiver_id=current_user.id, status='pending'
+    ).all()
+    return render_template('message_requests.html', requests=requests_received)
+
+@app.route('/messages/requests/<int:req_id>/<action>')
+@login_required
+def handle_request(req_id, action):
+    req = db.session.get(MessageRequest, req_id)
+    if req and req.receiver_id == current_user.id:
+        if action == 'accept':
+            req.status = 'accepted'
+            db.session.commit()
+            flash('Message request accepted!', 'success')
+        elif action == 'decline':
+            req.status = 'declined'
+            db.session.commit()
+            flash('Message request declined.', 'danger')
+    return redirect(url_for('message_requests'))
 
 # ── Leaderboard ──────────────────────────────────────────
 @app.route('/leaderboard')

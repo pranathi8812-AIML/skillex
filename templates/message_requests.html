@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Message Requests{% endblock %}
+
+{% block content %}
+<section class="messages-section">
+  <h2><i class="fa-solid fa-bell"></i> Message Requests</h2>
+
+  {% if requests %}
+  <div class="messages-list">
+    {% for r in requests %}
+    <div class="message-card">
+      <div class="message-header">
+        <span class="message-sender">
+          <i class="fa-solid fa-user-circle"></i>
+          <strong>User #{{ r.sender_id }}</strong> wants to message you
+        </span>
+        <span class="message-time">{{ r.created_at.strftime('%d %b %Y') }}</span>
+      </div>
+      <div class="request-actions">
+        <a href="{{ url_for('handle_request', req_id=r.id, action='accept') }}" class="btn-primary btn-sm">
+          <i class="fa-solid fa-check"></i> Accept
+        </a>
+        <a href="{{ url_for('handle_request', req_id=r.id, action='decline') }}" class="btn-danger btn-sm">
+          <i class="fa-solid fa-x"></i> Decline
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="fa-solid fa-bell-slash"></i>
+    <p>No pending message requests.</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

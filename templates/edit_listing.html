@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Edit Listing{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+  <div class="auth-card wide-card">
+    <div class="auth-header">
+      <i class="fa-solid fa-pen-to-square"></i>
+      <h2>Edit Listing</h2>
+      <p>Update your skill listing details</p>
+    </div>
+
+    <form method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Type</label>
+          <select name="type" required>
+            <option value="offer" {% if listing.type == 'offer' %}selected{% endif %}>I can Offer this skill</option>
+            <option value="request" {% if listing.type == 'request' %}selected{% endif %}>I need help (Request)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select name="category" required>
+            {% for cat in ['Education','Home Repair','Cooking','Technology','Health','Arts','Transport','Other'] %}
+            <option value="{{ cat }}" {% if listing.category == cat %}selected{% endif %}>{{ cat }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" name="title" value="{{ listing.title }}" required/>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" rows="4" required>{{ listing.description }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Credits</label>
+        <input type="number" name="credits" min="1" max="20" value="{{ listing.credits }}" required/>
+      </div>
+
+      <div class="form-row">
+        <button type="submit" class="btn-primary btn-full">
+          <i class="fa-solid fa-save"></i> Save Changes
+        </button>
+        <a href="{{ url_for('view_listing', id=listing.id) }}" class="btn-outline btn-full">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
