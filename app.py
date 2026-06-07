@@ -21,6 +21,22 @@ def get_avatar_url(user):
 
 app.jinja_env.globals['get_avatar_url'] = get_avatar_url
 
+@app.context_processor
+def inject_notifications():
+    if current_user.is_authenticated:
+        unread_messages = Message.query.filter_by(
+            receiver_id=current_user.id, is_read=False
+        ).count()
+        pending_requests = MessageRequest.query.filter_by(
+            receiver_id=current_user.id, status='pending'
+        ).count()
+        total_notifications = unread_messages + pending_requests
+        return dict(
+            unread_messages=unread_messages,
+            pending_requests=pending_requests,
+            total_notifications=total_notifications
+        )
+    return dict(unread_messages=0, pending_requests=0, total_notifications=0)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
@@ -229,6 +245,9 @@ def edit_profile():
 def messages():
     received = Message.query.filter_by(receiver_id=current_user.id).order_by(Message.sent_at.desc()).all()
     sent = Message.query.filter_by(sender_id=current_user.id).order_by(Message.sent_at.desc()).all()
+    # Mark all as read
+    Message.query.filter_by(receiver_id=current_user.id, is_read=False).update({'is_read': True})
+    db.session.commit()
     return render_template('messages.html', messages=received, sent=sent)
 
 @app.route('/messages/send/<int:receiver_id>', methods=['GET', 'POST'])
