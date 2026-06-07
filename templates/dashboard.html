@@ -59,7 +59,7 @@
         <div class="dash-item">
           <div>
             <span class="badge badge-{{ e.status }}">{{ e.status | capitalize }}</span>
-            <span>Exchange #{{ e.id }}</span>
+            <span>{{ e.listing.title if e.listing else 'Exchange #' + e.id|string }}</span>
           </div>
           {% if e.status == 'pending' and e.helper_id == current_user.id %}
             <a href="{{ url_for('complete_exchange', id=e.id) }}" class="btn-primary btn-sm">Mark Done</a>

@@ -12,7 +12,7 @@
       <div class="message-header">
         <span class="message-sender">
           <i class="fa-solid fa-user-circle"></i>
-          <strong>User #{{ r.sender_id }}</strong> wants to message you
+          <strong>{{ r.sender.name if r.sender else 'Unknown' }}</strong> wants to message you
         </span>
         <span class="message-time">{{ r.created_at.strftime('%d %b %Y') }}</span>
       </div>
