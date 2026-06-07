@@ -103,7 +103,17 @@ def dashboard():
         (Exchange.helper_id == current_user.id) | (Exchange.requester_id == current_user.id)
     ).order_by(Exchange.created_at.desc()).all()
     transactions = CreditTransaction.query.filter_by(user_id=current_user.id).order_by(CreditTransaction.created_at.desc()).limit(5).all()
-    return render_template('dashboard.html', my_listings=my_listings, exchanges=exchanges, transactions=transactions)
+
+    # Get exchange ids already reviewed by current user
+    reviewed_exchange_ids = [
+        r.exchange_id for r in Review.query.filter_by(reviewer_id=current_user.id).all()
+    ]
+    return render_template('dashboard.html',
+        my_listings=my_listings,
+        exchanges=exchanges,
+        transactions=transactions,
+        reviewed_exchange_ids=reviewed_exchange_ids
+    )
 
 # ── Skill Board ─────────────────────────────────────────
 @app.route('/board')
@@ -216,6 +226,50 @@ def complete_exchange(id):
         db.session.commit()
         flash('Exchange completed! Credits transferred.', 'success')
     return redirect(url_for('dashboard'))
+
+# ── Submit Review ─────────────────────────────────────────
+@app.route('/exchange/<int:id>/review', methods=['GET', 'POST'])
+@login_required
+def submit_review(id):
+    exchange = db.session.get(Exchange, id)
+    if not exchange or exchange.status != 'completed':
+        flash('Exchange not completed yet.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    # Only helper or requester can review
+    if current_user.id not in [exchange.helper_id, exchange.requester_id]:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    # Determine who is being reviewed
+    if current_user.id == exchange.helper_id:
+        reviewee_id = exchange.requester_id
+    else:
+        reviewee_id = exchange.helper_id
+
+    # Check if already reviewed
+    existing = Review.query.filter_by(
+        exchange_id=id, reviewer_id=current_user.id
+    ).first()
+    if existing:
+        flash('You already reviewed this exchange.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        review = Review(
+            exchange_id=id,
+            reviewer_id=current_user.id,
+            reviewee_id=reviewee_id,
+            rating=int(request.form['rating']),
+            comment=request.form['comment']
+        )
+        db.session.add(review)
+        db.session.commit()
+        flash('Review submitted! Thank you.', 'success')
+        return redirect(url_for('dashboard'))
+
+    reviewee = db.session.get(User, reviewee_id)
+    return render_template('submit_review.html', exchange=exchange, reviewee=reviewee)
 
 # ── Profile ─────────────────────────────────────────────
 @app.route('/profile/<int:id>')

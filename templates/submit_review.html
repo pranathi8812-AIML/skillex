@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Review {{ reviewee.name }}{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+  <div class="auth-card">
+    <div class="auth-header">
+      <img src="{{ get_avatar_url(reviewee) }}" 
+           style="width:80px;height:80px;border-radius:50%;margin:0 auto 1rem;display:block;"/>
+      <h2>Review {{ reviewee.name }}</h2>
+      <p>How was your exchange experience?</p>
+    </div>
+
+    <form method="POST">
+      <div class="form-group">
+        <label>Rating</label>
+        <div class="star-rating">
+          {% for i in range(1, 6) %}
+          <input type="radio" name="rating" id="star{{ i }}" value="{{ i }}" required/>
+          <label for="star{{ i }}" class="star-label">
+            <i class="fa-solid fa-star"></i>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Comment <span class="hint">(optional)</span></label>
+        <textarea name="comment" rows="3" 
+                  placeholder="Share your experience with this person..."></textarea>
+      </div>
+
+      <button type="submit" class="btn-primary btn-full">
+        <i class="fa-solid fa-star"></i> Submit Review
+      </button>
+      <a href="{{ url_for('dashboard') }}" class="btn-outline btn-full" style="margin-top:0.8rem;">
+        Skip for now
+      </a>
+    </form>
+  </div>
+</section>
+{% endblock %}

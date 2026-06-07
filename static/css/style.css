@@ -762,3 +762,23 @@ body::after {
   50%  { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(239,68,68,0); }
   100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239,68,68,0); }
 }
+
+/* ── Star Rating ─────────────────────────────────────── */
+.star-rating {
+  display: flex; flex-direction: row-reverse;
+  justify-content: flex-end; gap: 4px; margin-top: 0.5rem;
+}
+.star-rating input[type="radio"] { display: none; }
+.star-label { font-size: 2rem; color: rgba(255,255,255,0.2); cursor: pointer; transition: color 0.2s; }
+.star-rating input:checked ~ label .fa-star,
+.star-rating label:hover ~ label .fa-star,
+.star-label:hover .fa-star { color: var(--accent); }
+.star-rating input:checked + label .fa-star,
+.star-label:hover .fa-star { color: var(--accent); }
+
+/* ── Exchange Description ────────────────────────────── */
+.exchange-desc { display: flex; flex-direction: column; gap: 2px; }
+.exchange-desc strong { font-size: 0.875rem; color: var(--white); }
+.exchange-desc small { font-size: 0.75rem; color: #64748b; }
+.transaction-desc { display: flex; align-items: center; gap: 8px; font-size: 0.875rem; }
+.transaction-desc small { color: #64748b; font-size: 0.75rem; }

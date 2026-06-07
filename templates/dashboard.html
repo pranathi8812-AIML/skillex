@@ -55,20 +55,47 @@
         <h3><i class="fa-solid fa-handshake"></i> My Exchanges</h3>
       </div>
       {% if exchanges %}
-        {% for e in exchanges %}
-        <div class="dash-item">
-          <div>
-            <span class="badge badge-{{ e.status }}">{{ e.status | capitalize }}</span>
-            <span>{{ e.listing.title if e.listing else 'Exchange #' + e.id|string }}</span>
-          </div>
-          {% if e.status == 'pending' and e.helper_id == current_user.id %}
-            <a href="{{ url_for('complete_exchange', id=e.id) }}" class="btn-primary btn-sm">Mark Done</a>
-          {% endif %}
-        </div>
-        {% endfor %}
-      {% else %}
-        <p class="empty">No exchanges yet.</p>
+  {% for e in exchanges %}
+  <div class="dash-item">
+    <div>
+      <span class="badge badge-{{ e.status }}">{{ e.status | capitalize }}</span>
+      <span class="exchange-desc">
+        {% set helper = e.helper_id | int %}
+        {% set requester = e.requester_id | int %}
+        {% if e.listing %}
+          <strong>{{ e.listing.title }}</strong>
+          <small>
+            {% if e.status == 'completed' %}
+              ✅ Credits exchanged
+            {% else %}
+              🔄 In progress
+            {% endif %}
+          </small>
+        {% endif %}
+      </span>
+    </div>
+    <div class="dash-item-actions">
+      {% if e.status == 'pending' and e.helper_id == current_user.id %}
+        <a href="{{ url_for('complete_exchange', id=e.id) }}" class="btn-primary btn-sm">
+          Mark Done
+        </a>
       {% endif %}
+      {% if e.status == 'completed' %}
+        {% set already_reviewed = e.id in reviewed_exchange_ids %}
+        {% if not already_reviewed %}
+          <a href="{{ url_for('submit_review', id=e.id) }}" class="btn-outline btn-sm">
+            <i class="fa-solid fa-star"></i> Review
+          </a>
+        {% else %}
+          <span class="badge badge-completed">Reviewed ✓</span>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <p class="empty">No exchanges yet.</p>
+{% endif %}
     </div>
 
     <!-- Credit History -->
@@ -77,14 +104,23 @@
         <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Credits</h3>
       </div>
       {% if transactions %}
-        {% for t in transactions %}
-        <div class="dash-item">
-          <span>{{ t.reason }}</span>
-          <span class="{% if t.amount > 0 %}credit-plus{% else %}credit-minus{% endif %}">
-            {% if t.amount > 0 %}+{% endif %}{{ t.amount }}
-          </span>
-        </div>
-        {% endfor %}
+       {% for t in transactions %}
+<div class="dash-item">
+  <span class="transaction-desc">
+    {% if t.amount > 0 %}
+      <i class="fa-solid fa-arrow-down" style="color:#6ee7b7"></i>
+      Credits received
+    {% else %}
+      <i class="fa-solid fa-arrow-up" style="color:#fca5a5"></i>
+      Credits spent
+    {% endif %}
+    <small>{{ t.created_at.strftime('%d %b') }}</small>
+  </span>
+  <span class="{% if t.amount > 0 %}credit-plus{% else %}credit-minus{% endif %}">
+    {% if t.amount > 0 %}+{% endif %}{{ t.amount }}
+  </span>
+</div>
+{% endfor %} 
       {% else %}
         <p class="empty">No transactions yet.</p>
       {% endif %}
