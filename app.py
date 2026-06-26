@@ -219,10 +219,20 @@ def complete_exchange(id):
 
         requester.credits -= listing.credits
         current_user.credits += listing.credits
-        listing.status = 'closed'
 
-        db.session.add(CreditTransaction(user_id=requester.id, amount=-listing.credits, reason=f'Exchange #{exchange.id}'))
-        db.session.add(CreditTransaction(user_id=current_user.id, amount=listing.credits, reason=f'Exchange #{exchange.id}'))
+        # Increment exchange count
+        listing.exchange_count = (listing.exchange_count or 0) + 1
+
+        db.session.add(CreditTransaction(
+            user_id=requester.id,
+            amount=-listing.credits,
+            reason=f'Exchange with {current_user.name} for "{listing.title}"'
+        ))
+        db.session.add(CreditTransaction(
+            user_id=current_user.id,
+            amount=listing.credits,
+            reason=f'Exchange with {requester.name} for "{listing.title}"'
+        ))
         db.session.commit()
         flash('Exchange completed! Credits transferred.', 'success')
     return redirect(url_for('dashboard'))

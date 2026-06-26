@@ -109,9 +109,10 @@
       <h3>{{ l.title }}</h3>
       <p>{{ l.description[:80] }}{% if l.description|length > 80 %}...{% endif %}</p>
       <div class="listing-meta">
-        <span><i class="fa-solid fa-location-dot"></i> {{ l.ward }}</span>
-        <span><i class="fa-solid fa-coins"></i> {{ l.credits }} credits</span>
-      </div>
+  <span><i class="fa-solid fa-location-dot"></i> {{ l.ward }}</span>
+  <span><i class="fa-solid fa-coins"></i> {{ l.credits }} credits</span>
+  <span><i class="fa-solid fa-handshake"></i> {{ l.exchange_count or 0 }} exchanges</span>
+</div>
     </a>
     {% endfor %}
   </div>

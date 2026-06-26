@@ -16,19 +16,23 @@
     <p class="listing-desc">{{ listing.description }}</p>
 
     <div class="listing-info-grid">
-      <div class="info-item">
-        <i class="fa-solid fa-location-dot"></i>
-        <span>{{ listing.ward }}</span>
-      </div>
-      <div class="info-item">
-        <i class="fa-solid fa-coins"></i>
-        <span>{{ listing.credits }} Credits</span>
-      </div>
-      <div class="info-item">
-        <i class="fa-solid fa-calendar"></i>
-        <span>{{ listing.created_at.strftime('%d %b %Y') }}</span>
-      </div>
-    </div>
+  <div class="info-item">
+    <i class="fa-solid fa-location-dot"></i>
+    <span>{{ listing.ward }}</span>
+  </div>
+  <div class="info-item">
+    <i class="fa-solid fa-coins"></i>
+    <span>{{ listing.credits }} Credits</span>
+  </div>
+  <div class="info-item">
+    <i class="fa-solid fa-calendar"></i>
+    <span>{{ listing.created_at.strftime('%d %b %Y') }}</span>
+  </div>
+  <div class="info-item">
+    <i class="fa-solid fa-handshake"></i>
+    <span>{{ listing.exchange_count or 0 }} Exchanges Done</span>
+  </div>
+</div>
 
     <div class="listing-author-card">
       <i class="fa-solid fa-user-circle fa-2x"></i>
