@@ -10,6 +10,16 @@
       <p>Login to your Skillex account</p>
     </div>
 
+    <!-- Google Login -->
+    <button class="google-btn" onclick="signInWithGoogle()">
+      <img src="https://www.google.com/favicon.ico" width="20" height="20" alt="Google"/>
+      Continue with Google
+    </button>
+
+    <div class="auth-divider">
+      <span>or login with email</span>
+    </div>
+
     <form method="POST">
       <div class="form-group">
         <label>Email Address</label>
@@ -25,4 +35,47 @@
     <p class="auth-switch">Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
   </div>
 </section>
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAEZfwqJauzhS_kI2gdlKOerHOSfnr4fY0",
+    authDomain: "skillex-890e1.firebaseapp.com",
+    projectId: "skillex-890e1",
+    storageBucket: "skillex-890e1.firebasestorage.app",
+    messagingSenderId: "574609988096",
+    appId: "1:574609988096:web:e4d351eaa6e840838d96e5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  window.signInWithGoogle = async function() {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const response = await fetch('/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          name: user.displayName,
+          uid: user.uid
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        window.location.href = data.redirect;
+      }
+    } catch (error) {
+      alert('Google sign-in failed: ' + error.message);
+    }
+  };
+</script>
 {% endblock %}

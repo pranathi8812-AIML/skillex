@@ -1,3 +1,4 @@
+import requests as http_requests
 from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -86,6 +87,35 @@ def login():
             return redirect(url_for('dashboard'))
         flash('Invalid email or password.', 'danger')
     return render_template('login.html')
+
+# ── Google Auth ──────────────────────────────────────────
+@app.route('/auth/google', methods=['POST'])
+def google_auth():
+    data = request.get_json()
+    email = data.get('email')
+    name = data.get('name')
+    google_id = data.get('uid')
+
+    if not email:
+        return jsonify({'error': 'No email provided'}), 400
+
+    # Find or create user
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        user = User(
+            name=name or email.split('@')[0],
+            email=email,
+            password=generate_password_hash(google_id),
+            ward='Not set',
+            avatar_seed=name or email,
+            avatar_style='adventurer'
+        )
+        db.session.add(user)
+        db.session.commit()
+
+    login_user(user)
+    return jsonify({'success': True, 'redirect': url_for('dashboard')})
+
 
 # ── Logout ──────────────────────────────────────────────
 @app.route('/logout')

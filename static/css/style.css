@@ -1269,3 +1269,27 @@ body::after {
 main {
   animation: fadeInUp 0.4s ease both;
 }
+
+/* ── Google Button ───────────────────────────────────── */
+.google-btn {
+  width: 100%; padding: 12px; border-radius: 10px;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08); color: white;
+  font-size: 0.95rem; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: all 0.2s; margin-bottom: 1.2rem;
+}
+.google-btn:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.4);
+  transform: translateY(-2px);
+}
+.auth-divider {
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 1.2rem; color: #64748b; font-size: 0.8rem;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: ''; flex: 1;
+  height: 1px; background: rgba(255,255,255,0.1);
+}
