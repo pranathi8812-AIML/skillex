@@ -51,5 +51,128 @@
   </footer>
 
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+<!-- Help Guide Button -->
+<button class="help-btn" onclick="toggleHelp()" title="How to use Skillex">
+  <i class="fa-solid fa-circle-question"></i>
+</button>
+
+<!-- Help Guide Panel -->
+<div class="help-panel" id="helpPanel">
+  <div class="help-header">
+    <h3>👋 How to Use Skillex</h3>
+    <button onclick="toggleHelp()" class="help-close">✕</button>
+  </div>
+  <div class="help-content">
+    <div class="help-step">
+      <span class="help-icon">1️⃣</span>
+      <div>
+        <strong>Create your account</strong>
+        <p>Click "Register" at the top. Enter your name, email, password and your area name.</p>
+      </div>
+    </div>
+    <div class="help-step">
+      <span class="help-icon">2️⃣</span>
+      <div>
+        <strong>You get 10 free credits</strong>
+        <p>When you join, you automatically get 10 credits. Think of credits like tokens for exchanging help.</p>
+      </div>
+    </div>
+    <div class="help-step">
+      <span class="help-icon">3️⃣</span>
+      <div>
+        <strong>Post what you can do</strong>
+        <p>Click "+ Post Skill" to tell people what you can help with — cooking, stitching, tutoring, repairs, anything!</p>
+      </div>
+    </div>
+    <div class="help-step">
+      <span class="help-icon">4️⃣</span>
+      <div>
+        <strong>Find help near you</strong>
+        <p>Click "Skill Board" to see what others are offering. You can filter by your area or category.</p>
+      </div>
+    </div>
+    <div class="help-step">
+      <span class="help-icon">5️⃣</span>
+      <div>
+        <strong>Send an exchange request</strong>
+        <p>Found something useful? Click on it and press "Send Exchange Request". The other person will help you.</p>
+      </div>
+    </div>
+    <div class="help-step">
+      <span class="help-icon">6️⃣</span>
+      <div>
+        <strong>Credits move automatically</strong>
+        <p>Once the help is done, credits go from your account to the helper. No cash needed!</p>
+      </div>
+    </div>
+    <div class="help-step">
+      <span class="help-icon">7️⃣</span>
+      <div>
+        <strong>Rate each other</strong>
+        <p>After the exchange, give stars to the person who helped you. This builds trust in the community.</p>
+      </div>
+    </div>
+    <div class="help-step">
+      <span class="help-icon">💬</span>
+      <div>
+        <strong>Send messages</strong>
+        <p>Click "Message" on anyone's profile to chat. They need to accept your request first for privacy.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="help-overlay" id="helpOverlay" onclick="toggleHelp()"></div>
+
+<!-- Website Review Popup -->
+<div class="site-review-popup" id="siteReviewPopup">
+  <button class="site-review-close" onclick="closeSiteReview()">✕</button>
+  <div class="site-review-content">
+    <div class="site-review-emoji">🌟</div>
+    <h4>Enjoying Skillex?</h4>
+    <p>We'd love to hear what you think!</p>
+    <div class="site-review-stars" id="siteStars">
+      <span class="site-star" onclick="rateSite(1)">⭐</span>
+      <span class="site-star" onclick="rateSite(2)">⭐</span>
+      <span class="site-star" onclick="rateSite(3)">⭐</span>
+      <span class="site-star" onclick="rateSite(4)">⭐</span>
+      <span class="site-star" onclick="rateSite(5)">⭐</span>
+    </div>
+    <div id="siteReviewThanks" style="display:none;">
+      <p class="review-thanks">Thank you so much! 💖</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// Help Panel
+function toggleHelp() {
+  const panel = document.getElementById('helpPanel');
+  const overlay = document.getElementById('helpOverlay');
+  panel.classList.toggle('open');
+  overlay.classList.toggle('open');
+}
+
+// Site Review
+function closeSiteReview() {
+  document.getElementById('siteReviewPopup').style.display = 'none';
+  localStorage.setItem('skillex_reviewed', 'true');
+}
+
+function rateSite(rating) {
+  document.getElementById('siteStars').style.display = 'none';
+  document.getElementById('siteReviewThanks').style.display = 'block';
+  setTimeout(() => closeSiteReview(), 2000);
+}
+
+// Show review popup after 30 seconds if not already reviewed
+setTimeout(() => {
+  if (!localStorage.getItem('skillex_reviewed')) {
+    document.getElementById('siteReviewPopup').style.display = 'flex';
+  }
+}, 30000);
+</script>
+
+
 </body>
 </html>
