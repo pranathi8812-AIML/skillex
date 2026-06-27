@@ -17,7 +17,6 @@ class User(UserMixin, db.Model):
     avatar_style = db.Column(db.String(50), default='adventurer')
     role = db.Column(db.String(20), default='user')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
     listings = db.relationship('Listing', backref='author', lazy=True)
     reviews_given = db.relationship('Review', foreign_keys='Review.reviewer_id', backref='reviewer', lazy=True)
     reviews_received = db.relationship('Review', foreign_keys='Review.reviewee_id', backref='reviewee', lazy=True)
@@ -34,19 +33,8 @@ class Listing(db.Model):
     ward = db.Column(db.String(100), nullable=False)
     status = db.Column(db.String(20), default='open')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-class Listing(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    type = db.Column(db.String(10), nullable=False)
-    category = db.Column(db.String(50), nullable=False)
-    title = db.Column(db.String(150), nullable=False)
-    description = db.Column(db.String(500), nullable=False)
-    credits = db.Column(db.Integer, default=2)
-    ward = db.Column(db.String(100), nullable=False)
-    status = db.Column(db.String(20), default='open')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     exchange_count = db.Column(db.Integer, default=0)
+
 
 class Exchange(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -86,6 +74,7 @@ class CreditTransaction(db.Model):
     amount = db.Column(db.Integer, nullable=False)
     reason = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class MessageRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)

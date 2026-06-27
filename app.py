@@ -187,7 +187,6 @@ def delete_listing(id):
 
 # ── View Listing & Send Exchange Request ────────────────
 @app.route('/listing/<int:id>', methods=['GET', 'POST'])
-@login_required
 def view_listing(id):
     listing = db.session.get(Listing, id)
     if request.method == 'POST':
@@ -428,8 +427,7 @@ def admin():
     return render_template('admin.html', users=users, listings=listings, exchanges=exchanges)
 
 # ── Run ──────────────────────────────────────────────────
-with app.app_context():
-    db.create_all()
-
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=False)
