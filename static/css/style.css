@@ -1293,3 +1293,19 @@ main {
   content: ''; flex: 1;
   height: 1px; background: rgba(255,255,255,0.1);
 }
+
+/* ── Home Button ─────────────────────────────────────── */
+.nav-home-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #a5b4fc !important; font-size: 0.95rem;
+  transition: all 0.2s; margin-right: 4px;
+}
+.nav-home-btn:hover {
+  background: rgba(79,70,229,0.3) !important;
+  border-color: rgba(165,180,252,0.5);
+  transform: translateY(-2px);
+  color: white !important;
+}
