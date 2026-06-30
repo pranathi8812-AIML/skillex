@@ -1308,4 +1308,27 @@ main {
   border-color: rgba(165,180,252,0.5);
   transform: translateY(-2px);
   color: white !important;
+} 
+
+/* ── Navbar Cleanup ──────────────────────────────────── */
+.nav-divider {
+  width: 1px; height: 24px;
+  background: rgba(255,255,255,0.15);
+  margin: 0 6px;
 }
+.nav-profile-link {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 12px 4px 4px; border-radius: 20px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.2s;
+}
+.nav-profile-link:hover {
+  background: rgba(79,70,229,0.2);
+  border-color: rgba(165,180,252,0.4);
+}
+.nav-avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+}
+.nav-links a i { margin-right: 4px; font-size: 0.8rem; }

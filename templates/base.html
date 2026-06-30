@@ -10,37 +10,43 @@
 <body>
 
   <nav class="navbar">
-    <a href="{{ url_for('home') }}" class="nav-brand">
-      <i class="fa-solid fa-arrows-spin"></i> Skillex
-    </a>
-    <div class="nav-links">
-
-      {% if current_user.is_authenticated %}
-  <a href="{{ url_for('dashboard') }}" class="nav-home-btn" title="Dashboard">
-    <i class="fa-solid fa-house"></i>
+  <a href="{{ url_for('home') }}" class="nav-brand">
+    <i class="fa-solid fa-arrows-spin"></i> Skillex
   </a>
-  {% endif %}
-  <a href="{{ url_for('board') }}">Skill Board</a>
-  
-      <a href="{{ url_for('board') }}">Skill Board</a>
-      <a href="{{ url_for('leaderboard') }}">Leaderboard</a>
-      {% if current_user.is_authenticated %}
-        <a href="{{ url_for('post_listing') }}">+ Post Skill</a>
-        <a href="{{ url_for('messages') }}" class="nav-notif-wrap">
-  Messages
-  {% if unread_messages > 0 %}
-  <span class="notif-badge">{{ unread_messages }}</span>
-  {% endif %}
-</a>
-        <a href="{{ url_for('dashboard') }}">Dashboard</a>
-        <a href="{{ url_for('profile', id=current_user.id) }}">{{ current_user.name }}</a>
-        <a href="{{ url_for('logout') }}" class="btn-outline">Logout</a>
-      {% else %}
-        <a href="{{ url_for('login') }}" class="btn-outline">Login</a>
-        <a href="{{ url_for('register') }}" class="btn-primary">Register</a>
-      {% endif %}
-    </div>
-  </nav>
+  <div class="nav-links">
+    <a href="{{ url_for('board') }}">
+      <i class="fa-solid fa-magnifying-glass"></i> Browse
+    </a>
+    <a href="{{ url_for('leaderboard') }}">
+      <i class="fa-solid fa-trophy"></i> Leaderboard
+    </a>
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('post_listing') }}">
+        <i class="fa-solid fa-plus"></i> Post Skill
+      </a>
+      <a href="{{ url_for('messages') }}" class="nav-notif-wrap">
+        <i class="fa-solid fa-envelope"></i> Messages
+        {% if unread_messages > 0 %}
+        <span class="notif-badge">{{ unread_messages }}</span>
+        {% endif %}
+      </a>
+
+      <div class="nav-divider"></div>
+
+      <a href="{{ url_for('dashboard') }}" class="nav-home-btn" title="Dashboard">
+        <i class="fa-solid fa-house"></i>
+      </a>
+      <a href="{{ url_for('profile', id=current_user.id) }}" class="nav-profile-link">
+        <img src="{{ get_avatar_url(current_user) }}" class="nav-avatar" alt="{{ current_user.name }}"/>
+        <span>{{ current_user.name.split(' ')[0] }}</span>
+      </a>
+      <a href="{{ url_for('logout') }}" class="btn-outline">Logout</a>
+    {% else %}
+      <a href="{{ url_for('login') }}" class="btn-outline">Login</a>
+      <a href="{{ url_for('register') }}" class="btn-primary">Register</a>
+    {% endif %}
+  </div>
+</nav>
 
   <div class="flash-messages">
     {% with messages = get_flashed_messages(with_categories=true) %}
