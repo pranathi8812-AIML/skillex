@@ -444,6 +444,39 @@ def leaderboard():
     users = User.query.order_by(User.credits.desc()).limit(10).all()
     return render_template('leaderboard.html', users=users)
 
+
+# ── Notifications ─────────────────────────────────────
+@app.route('/notifications')
+@login_required
+def notifications():
+    # Recent exchanges
+    exchanges = Exchange.query.filter(
+        (Exchange.helper_id == current_user.id) |
+        (Exchange.requester_id == current_user.id)
+    ).order_by(Exchange.created_at.desc()).limit(10).all()
+
+    # Recent messages
+    messages_received = Message.query.filter_by(
+        receiver_id=current_user.id
+    ).order_by(Message.sent_at.desc()).limit(10).all()
+
+    # Recent reviews received
+    reviews = Review.query.filter_by(
+        reviewee_id=current_user.id
+    ).order_by(Review.created_at.desc()).limit(10).all()
+
+    # Message requests
+    msg_requests = MessageRequest.query.filter_by(
+        receiver_id=current_user.id
+    ).order_by(MessageRequest.created_at.desc()).limit(10).all()
+
+    return render_template('notifications.html',
+        exchanges=exchanges,
+        messages_received=messages_received,
+        reviews=reviews,
+        msg_requests=msg_requests
+    )
+
 # ── Admin ────────────────────────────────────────────────
 @app.route('/admin')
 @login_required

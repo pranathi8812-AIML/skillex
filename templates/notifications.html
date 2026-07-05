@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<section class="notif-page">
+  <div class="notif-page-header">
+    <h2><i class="fa-solid fa-bell"></i> Activity & Notifications</h2>
+    <p>Everything happening in your Skillex community</p>
+  </div>
+
+  <div class="notif-grid">
+
+    <!-- Message Requests -->
+    <div class="notif-section">
+      <h3 class="notif-section-title">
+        <i class="fa-solid fa-user-plus"></i> Message Requests
+        {% if msg_requests %}
+        <span class="notif-count">{{ msg_requests|length }}</span>
+        {% endif %}
+      </h3>
+      {% if msg_requests %}
+        {% for r in msg_requests %}
+        <div class="notif-item {% if r.status == 'pending' %}notif-unread{% endif %}">
+          <div class="notif-icon-wrap msg-req-icon">
+            <i class="fa-solid fa-envelope"></i>
+          </div>
+          <div class="notif-body">
+            <p>
+              <strong>{{ r.sender.name if r.sender else 'Someone' }}</strong>
+              wants to message you
+            </p>
+            <small>{{ r.created_at.strftime('%d %b %Y, %I:%M %p') }}</small>
+            <span class="badge badge-{{ r.status }}">{{ r.status | capitalize }}</span>
+          </div>
+          {% if r.status == 'pending' %}
+          <div class="notif-actions">
+            <a href="{{ url_for('handle_request', req_id=r.id, action='accept') }}" class="btn-primary btn-sm">Accept</a>
+            <a href="{{ url_for('handle_request', req_id=r.id, action='decline') }}" class="btn-danger btn-sm">Decline</a>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="notif-empty">
+          <i class="fa-solid fa-user-plus"></i>
+          <p>No message requests</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Messages -->
+    <div class="notif-section">
+      <h3 class="notif-section-title">
+        <i class="fa-solid fa-envelope"></i> Recent Messages
+        {% if unread_messages > 0 %}
+        <span class="notif-count">{{ unread_messages }}</span>
+        {% endif %}
+      </h3>
+      {% if messages_received %}
+        {% for m in messages_received %}
+        <a href="{{ url_for('send_message', receiver_id=m.sender_id) }}" class="notif-item {% if not m.is_read %}notif-unread{% endif %}">
+          <div class="notif-icon-wrap msg-icon">
+            <img src="{{ get_avatar_url(m.sender) if m.sender else '' }}"
+                 onerror="this.style.display='none'"
+                 class="notif-avatar" alt=""/>
+          </div>
+          <div class="notif-body">
+            <p><strong>{{ m.sender.name if m.sender else 'Someone' }}</strong> sent you a message</p>
+            <small class="notif-preview">{{ m.body[:60] }}{% if m.body|length > 60 %}...{% endif %}</small>
+            <small>{{ m.sent_at.strftime('%d %b %Y, %I:%M %p') }}</small>
+          </div>
+          {% if not m.is_read %}
+          <span class="notif-dot"></span>
+          {% endif %}
+        </a>
+        {% endfor %}
+      {% else %}
+        <div class="notif-empty">
+          <i class="fa-solid fa-envelope-open"></i>
+          <p>No messages yet</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Exchanges -->
+    <div class="notif-section">
+      <h3 class="notif-section-title">
+        <i class="fa-solid fa-handshake"></i> Recent Exchanges
+      </h3>
+      {% if exchanges %}
+        {% for e in exchanges %}
+        <div class="notif-item">
+          <div class="notif-icon-wrap exchange-icon">
+            <i class="fa-solid fa-handshake"></i>
+          </div>
+          <div class="notif-body">
+            <p>
+              {% if e.listing %}
+                Exchange for <strong>{{ e.listing.title }}</strong>
+              {% else %}
+                Exchange #{{ e.id }}
+              {% endif %}
+            </p>
+            <small>{{ e.created_at.strftime('%d %b %Y') }}</small>
+            <span class="badge badge-{{ e.status }}">{{ e.status | capitalize }}</span>
+          </div>
+          {% if e.status == 'pending' and e.helper_id == current_user.id %}
+          <a href="{{ url_for('complete_exchange', id=e.id) }}" class="btn-primary btn-sm">
+            Mark Done
+          </a>
+          {% endif %}
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="notif-empty">
+          <i class="fa-solid fa-handshake"></i>
+          <p>No exchanges yet</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Reviews -->
+    <div class="notif-section">
+      <h3 class="notif-section-title">
+        <i class="fa-solid fa-star"></i> Reviews Received
+      </h3>
+      {% if reviews %}
+        {% for r in reviews %}
+        <div class="notif-item">
+          <div class="notif-icon-wrap review-icon">
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <div class="notif-body">
+            <p>
+              <strong>{{ r.reviewer.name if r.reviewer else 'Someone' }}</strong>
+              left you a review
+            </p>
+            <div class="notif-stars">
+              {% for i in range(r.rating) %}<i class="fa-solid fa-star" style="color:var(--accent);font-size:0.75rem"></i>{% endfor %}
+              {% for i in range(5 - r.rating) %}<i class="fa-regular fa-star" style="color:var(--accent);font-size:0.75rem"></i>{% endfor %}
+            </div>
+            {% if r.comment %}
+            <small class="notif-preview">{{ r.comment[:80] }}{% if r.comment|length > 80 %}...{% endif %}</small>
+            {% endif %}
+            <small>{{ r.created_at.strftime('%d %b %Y') }}</small>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="notif-empty">
+          <i class="fa-regular fa-star"></i>
+          <p>No reviews yet</p>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

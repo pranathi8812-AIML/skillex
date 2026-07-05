@@ -74,3 +74,32 @@ document.querySelectorAll('textarea').forEach(ta => {
     counter.style.color = ta.value.length > max * 0.9 ? '#ef4444' : '#64748b';
   });
 });
+
+// ── Skeleton Loading ──────────────────────────────────
+function showSkeletons(containerId, count = 6) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    container.innerHTML += `
+      <div class="skeleton-card">
+        <div class="skeleton-badge"></div>
+        <div class="skeleton-title"></div>
+        <div class="skeleton-text"></div>
+        <div class="skeleton-text short"></div>
+        <div class="skeleton-meta">
+          <div class="skeleton-pill"></div>
+          <div class="skeleton-pill"></div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+// Show skeletons on board and home listing grids while loading
+document.addEventListener('DOMContentLoaded', () => {
+  const listingGrid = document.querySelector('.listing-grid');
+  if (listingGrid && listingGrid.children.length === 0) {
+    showSkeletons('listingGrid', 6);
+  }
+});
