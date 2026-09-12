@@ -86,7 +86,7 @@ class MessageRequest(db.Model):
     receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_requests')
 
 
-    class PaidService(db.Model):
+class PaidService(db.Model):
     __tablename__ = 'paid_service'
     id = db.Column(db.Integer, primary_key=True)
     provider_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
