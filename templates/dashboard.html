@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard{% endblock %}
 
-{% block content %}
+{% block page_icon %}<i class="fa-solid fa-house"></i>{% endblock %}
+{% block page_title %}My Dashboard{% endblock %}
+{% block page_subtitle %}Welcome back, {{ current_user.name }}! Here's your activity overview.{% endblock %}
+{% block content %} 
 <section class="dashboard">
 
   <div class="dash-header">
@@ -158,3 +161,4 @@
   </div>
 </section>
 {% endblock %}
+

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Edit Service{% endblock %}
+{% block page_icon %}<i class="fa-solid fa-pen"></i>{% endblock %}
+{% block page_title %}Edit Service{% endblock %}
+{% block page_subtitle %}Update your paid service listing details.{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+  <div class="auth-card wide-card">
+    <div class="auth-header">
+      <i class="fa-solid fa-pen-to-square" style="color:#10b981"></i>
+      <h2>Edit Service</h2>
+      <p>Update your service listing</p>
+    </div>
+
+    <form method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category</label>
+          <select name="category" required>
+            {% for cat in ['Home Repair','Cleaning','Cooking','Tutoring','Technology','Transport','Healthcare','Other'] %}
+            <option value="{{ cat }}" {% if service.category == cat %}selected{% endif %}>{{ cat }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Price (₹)</label>
+          <input type="number" name="price" value="{{ service.price }}" required/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" name="title" value="{{ service.title }}" required/>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" rows="4" required>{{ service.description }}</textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" name="location" value="{{ service.location }}" required/>
+        </div>
+        <div class="form-group">
+          <label>Duration</label>
+          <input type="text" name="duration" value="{{ service.duration }}" required/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Availability</label>
+        <input type="text" name="availability" value="{{ service.availability }}" required/>
+      </div>
+      <div class="form-row">
+        <button type="submit" class="paid-btn-primary paid-btn-full">
+          <i class="fa-solid fa-save"></i> Save Changes
+        </button>
+        <a href="{{ url_for('view_paid_service', id=service.id) }}"
+           class="btn-outline paid-btn-full" style="display:flex;justify-content:center;align-items:center;">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

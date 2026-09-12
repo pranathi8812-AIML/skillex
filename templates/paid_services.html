@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Paid Services{% endblock %}
+{% block page_icon %}<i class="fa-solid fa-handshake-simple"></i>{% endblock %}
+{% block page_title %}Hire Nearby Help{% endblock %}
+{% block page_subtitle %}Find trusted community members offering affordable paid services near you.{% endblock %}
+
+{% block content %}
+<section class="paid-board-section">
+
+  <!-- Search & Filters -->
+  <form method="GET" class="paid-filter-bar">
+    <input type="text" name="search" placeholder="🔍 Search services..." value="{{ search }}"/>
+    <select name="category">
+      <option value="">All Categories</option>
+      {% for cat in ['Home Repair','Cleaning','Cooking','Tutoring','Technology','Transport','Healthcare','Other'] %}
+      <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>{{ cat }}</option>
+      {% endfor %}
+    </select>
+    <input type="text" name="location" placeholder="📍 Location / Ward" value="{{ location }}"/>
+    <select name="max_price">
+      <option value="">Any Price</option>
+      <option value="100" {% if max_price == '100' %}selected{% endif %}>Under ₹100</option>
+      <option value="200" {% if max_price == '200' %}selected{% endif %}>Under ₹200</option>
+      <option value="500" {% if max_price == '500' %}selected{% endif %}>Under ₹500</option>
+      <option value="1000" {% if max_price == '1000' %}selected{% endif %}>Under ₹1000</option>
+    </select>
+    <button type="submit" class="paid-btn-primary">Filter</button>
+    <a href="{{ url_for('paid_services') }}" class="paid-btn-outline">Clear</a>
+  </form>
+
+  <!-- Header Actions -->
+  <div class="paid-board-header">
+    <p class="paid-results">{{ services|length }} service{{ 's' if services|length != 1 }} found</p>
+    {% if current_user.is_authenticated %}
+    <a href="{{ url_for('post_paid_service') }}" class="paid-btn-primary">
+      <i class="fa-solid fa-plus"></i> List Your Service
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- Service Cards -->
+  {% if services %}
+  <div class="paid-grid">
+    {% for s in services %}
+    <div class="paid-card">
+      <div class="paid-card-top">
+        <span class="paid-category-badge">{{ s.category }}</span>
+        <span class="paid-price">₹{{ s.price }}</span>
+      </div>
+      <h3>{{ s.title }}</h3>
+      <p>{{ s.description[:100] }}{% if s.description|length > 100 %}...{% endif %}</p>
+      <div class="paid-provider">
+        <img src="{{ get_avatar_url(s.provider) }}" class="paid-provider-avatar" alt="{{ s.provider.name }}"/>
+        <div>
+          <strong>{{ s.provider.name }}</strong>
+          <small><i class="fa-solid fa-location-dot"></i> {{ s.location }}</small>
+        </div>
+      </div>
+      <div class="paid-card-meta">
+        <span><i class="fa-solid fa-clock"></i> {{ s.availability }}</span>
+        <span><i class="fa-solid fa-hourglass"></i> {{ s.duration }}</span>
+      </div>
+      <a href="{{ url_for('view_paid_service', id=s.id) }}" class="paid-btn-primary paid-btn-full">
+        View & Book
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="fa-solid fa-store-slash"></i>
+    <p>No paid services found.</p>
+    {% if current_user.is_authenticated %}
+    <a href="{{ url_for('post_paid_service') }}" class="paid-btn-primary">Be the first to list!</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</section>
+{% endblock %}

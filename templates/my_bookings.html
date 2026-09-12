@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block title %}My Bookings{% endblock %}
+{% block page_icon %}<i class="fa-solid fa-calendar"></i>{% endblock %}
+{% block page_title %}My Bookings{% endblock %}
+{% block page_subtitle %}Manage your paid service bookings as customer and provider.{% endblock %}
+
+{% block content %}
+<section class="messages-section">
+
+  <div class="messages-tabs">
+    <button class="tab-btn active" onclick="showTab('customer', event)">
+      <i class="fa-solid fa-user"></i> My Requests
+    </button>
+    <button class="tab-btn" onclick="showTab('provider', event)">
+      <i class="fa-solid fa-briefcase"></i> My Services
+    </button>
+  </div>
+
+  <!-- As Customer -->
+  <div id="customer" class="tab-content active">
+    <h3 class="section-subtitle">Services I Booked</h3>
+    {% if as_customer %}
+    <div class="bookings-list">
+      {% for b in as_customer %}
+      <div class="booking-card">
+        <div class="booking-card-top">
+          <div>
+            <h4>{{ b.service.title if b.service else 'Service' }}</h4>
+            <p><i class="fa-solid fa-location-dot"></i>
+               {{ b.service.location if b.service else '' }}</p>
+            <p><i class="fa-solid fa-calendar"></i> {{ b.booking_date }}</p>
+            {% if b.notes %}
+            <p><i class="fa-solid fa-note-sticky"></i> {{ b.notes }}</p>
+            {% endif %}
+          </div>
+          <div class="booking-card-right">
+            <span class="paid-price">₹{{ b.service.price if b.service else '' }}</span>
+            <span class="booking-status-badge status-{{ b.status }}">
+              {{ b.status | capitalize }}
+            </span>
+          </div>
+        </div>
+        <div class="booking-card-actions">
+          {% if b.service %}
+          <a href="{{ url_for('view_paid_service', id=b.service_id) }}"
+             class="paid-btn-outline btn-sm">View Service</a>
+          {% endif %}
+          {% if b.status == 'pending' or b.status == 'accepted' %}
+          <a href="{{ url_for('cancel_booking', id=b.id) }}"
+             class="btn-danger btn-sm"
+             onclick="return confirm('Cancel this booking?')">
+            Cancel
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="fa-solid fa-calendar-xmark"></i>
+      <p>No bookings yet.</p>
+      <a href="{{ url_for('paid_services') }}" class="paid-btn-primary">Browse Services</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- As Provider -->
+  <div id="provider" class="tab-content">
+    <h3 class="section-subtitle">Bookings for My Services</h3>
+    {% if as_provider %}
+    <div class="bookings-list">
+      {% for b in as_provider %}
+      <div class="booking-card">
+        <div class="booking-card-top">
+          <div>
+            <h4>{{ b.service.title if b.service else 'Service' }}</h4>
+            <p><i class="fa-solid fa-user"></i>
+               Customer: <strong>{{ b.customer.name if b.customer else 'Unknown' }}</strong></p>
+            <p><i class="fa-solid fa-calendar"></i> {{ b.booking_date }}</p>
+            {% if b.notes %}
+            <p><i class="fa-solid fa-note-sticky"></i> {{ b.notes }}</p>
+            {% endif %}
+          </div>
+          <div class="booking-card-right">
+            <span class="paid-price">₹{{ b.service.price if b.service else '' }}</span>
+            <span class="booking-status-badge status-{{ b.status }}">
+              {{ b.status | capitalize }}
+            </span>
+          </div>
+        </div>
+        <div class="booking-card-actions">
+          {% if b.status == 'pending' %}
+          <a href="{{ url_for('accept_booking', id=b.id) }}" class="paid-btn-primary btn-sm">
+            <i class="fa-solid fa-check"></i> Accept
+          </a>
+          <a href="{{ url_for('cancel_booking', id=b.id) }}" class="btn-danger btn-sm">
+            Decline
+          </a>
+          {% elif b.status == 'accepted' %}
+          <a href="{{ url_for('complete_booking', id=b.id) }}" class="paid-btn-primary btn-sm">
+            <i class="fa-solid fa-flag-checkered"></i> Mark Complete
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="fa-solid fa-briefcase"></i>
+      <p>No bookings received yet.</p>
+      <a href="{{ url_for('post_paid_service') }}" class="paid-btn-primary">List a Service</a>
+    </div>
+    {% endif %}
+  </div>
+
+</section>
+
+<script>
+function showTab(tab, event) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+{% endblock %}

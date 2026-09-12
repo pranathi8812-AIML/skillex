@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}{{ service.title }}{% endblock %}
+
+{% block content %}
+<section class="listing-detail">
+  <div class="listing-detail-card">
+
+    <div class="paid-detail-top">
+      <span class="paid-category-badge">{{ service.category }}</span>
+      <span class="paid-price-large">₹{{ service.price }}</span>
+    </div>
+
+    <h2>{{ service.title }}</h2>
+    <p class="listing-desc">{{ service.description }}</p>
+
+    <div class="listing-info-grid">
+      <div class="info-item">
+        <i class="fa-solid fa-location-dot" style="color:#10b981"></i>
+        <span>{{ service.location }}</span>
+      </div>
+      <div class="info-item">
+        <i class="fa-solid fa-clock" style="color:#10b981"></i>
+        <span>{{ service.availability }}</span>
+      </div>
+      <div class="info-item">
+        <i class="fa-solid fa-hourglass" style="color:#10b981"></i>
+        <span>{{ service.duration }}</span>
+      </div>
+      <div class="info-item">
+        <i class="fa-solid fa-star" style="color:#f59e0b"></i>
+        <span>{{ avg_rating }}/5 ({{ reviews|length }} reviews)</span>
+      </div>
+    </div>
+
+    <!-- Provider Card -->
+    <div class="listing-author-card">
+      <img src="{{ get_avatar_url(service.provider) }}" style="width:50px;height:50px;border-radius:50%;"/>
+      <div style="flex:1">
+        <strong style="color:white">{{ service.provider.name }}</strong>
+        <p style="color:#94a3b8;font-size:0.85rem">{{ service.provider.ward }}</p>
+        <p style="color:#94a3b8;font-size:0.85rem">
+          <i class="fa-solid fa-coins" style="color:#f59e0b"></i>
+          {{ service.provider.credits }} community credits
+        </p>
+      </div>
+      <a href="{{ url_for('profile', id=service.provider.id) }}" class="btn-outline btn-sm">View Profile</a>
+    </div>
+
+    <!-- Owner actions -->
+    {% if current_user.is_authenticated and current_user.id == service.provider_id %}
+    <div class="owner-actions">
+      <a href="{{ url_for('edit_paid_service', id=service.id) }}" class="paid-btn-primary btn-sm">
+        <i class="fa-solid fa-pen"></i> Edit
+      </a>
+      <a href="{{ url_for('delete_paid_service', id=service.id) }}"
+         class="btn-danger btn-sm"
+         onclick="return confirm('Delete this service?')">
+        <i class="fa-solid fa-trash"></i> Delete
+      </a>
+    </div>
+
+    {% elif current_user.is_authenticated %}
+    <!-- Book Now -->
+    <a href="{{ url_for('book_service', id=service.id) }}" class="paid-btn-primary paid-btn-full" style="margin-top:1rem;display:flex;justify-content:center;">
+      <i class="fa-solid fa-calendar-check"></i> Book This Service — ₹{{ service.price }}
+    </a>
+
+    {% else %}
+    <p class="auth-switch" style="margin-top:1rem;">
+      <a href="{{ url_for('login') }}">Login</a> to book this service.
+    </p>
+    {% endif %}
+
+    <!-- Reviews -->
+    {% if reviews %}
+    <h3 class="section-subtitle" style="margin-top:2rem;">
+      <i class="fa-solid fa-star"></i> Reviews
+    </h3>
+    <div class="reviews-list">
+      {% for r in reviews %}
+      <div class="review-card">
+        <div class="review-stars">
+          {% for i in range(r.rating) %}<i class="fa-solid fa-star"></i>{% endfor %}
+          {% for i in range(5 - r.rating) %}<i class="fa-regular fa-star"></i>{% endfor %}
+        </div>
+        <p>{{ r.comment }}</p>
+        <small>{{ r.created_at.strftime('%d %b %Y') }}</small>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

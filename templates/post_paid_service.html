@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}List a Paid Service{% endblock %}
+{% block page_icon %}<i class="fa-solid fa-plus-circle"></i>{% endblock %}
+{% block page_title %}List a Paid Service{% endblock %}
+{% block page_subtitle %}Offer your skills to the community at an affordable price.{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+  <div class="auth-card wide-card">
+    <div class="auth-header">
+      <i class="fa-solid fa-indian-rupee-sign" style="color:#10b981"></i>
+      <h2>List Your Service</h2>
+      <p>Help your community and earn money doing what you're good at</p>
+    </div>
+
+    <form method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category</label>
+          <select name="category" required>
+            {% for cat in ['Home Repair','Cleaning','Cooking','Tutoring','Technology','Transport','Healthcare','Other'] %}
+            <option value="{{ cat }}">{{ cat }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Price (₹)</label>
+          <input type="number" name="price" min="1" placeholder="e.g. 150" required/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Service Title</label>
+        <input type="text" name="title" placeholder="e.g. Professional house cleaning service" required/>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" rows="4" placeholder="Describe your service in detail — what you offer, your experience, what's included..." required></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Location / Ward</label>
+          <input type="text" name="location" placeholder="e.g. Banjara Hills, Hyderabad" required/>
+        </div>
+        <div class="form-group">
+          <label>Estimated Duration</label>
+          <input type="text" name="duration" placeholder="e.g. 2-3 hours" required/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Availability</label>
+        <input type="text" name="availability" placeholder="e.g. Weekdays 9AM-6PM, Weekends available" required/>
+      </div>
+
+      <button type="submit" class="paid-btn-primary paid-btn-full" style="margin-top:0.5rem;">
+        <i class="fa-solid fa-check"></i> Publish Service
+      </button>
+    </form>
+  </div>
+</section>
+{% endblock %}

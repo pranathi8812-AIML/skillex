@@ -4,7 +4,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from config import Config
-from models import db, User, Listing, Exchange, Message, Review, CreditTransaction, MessageRequest
+from models import db, User, Listing, Exchange, Message, Review, CreditTransaction, MessageRequest, PaidService, PaidBooking
 from datetime import datetime
 import os
 
@@ -488,6 +488,189 @@ def admin():
     listings = Listing.query.order_by(Listing.created_at.desc()).all()
     exchanges = Exchange.query.all()
     return render_template('admin.html', users=users, listings=listings, exchanges=exchanges)
+
+# ── Paid Services ─────────────────────────────────────────
+
+@app.route('/paid-services')
+def paid_services():
+    category = request.args.get('category', '')
+    location = request.args.get('location', '')
+    max_price = request.args.get('max_price', '')
+    search = request.args.get('search', '')
+
+    query = PaidService.query.filter_by(status='active')
+
+    if category:
+        query = query.filter_by(category=category)
+    if location:
+        query = query.filter(PaidService.location.ilike(f'%{location}%'))
+    if max_price:
+        query = query.filter(PaidService.price <= float(max_price))
+    if search:
+        query = query.filter(
+            PaidService.title.ilike(f'%{search}%') |
+            PaidService.description.ilike(f'%{search}%')
+        )
+
+    services = query.order_by(PaidService.created_at.desc()).all()
+    return render_template('paid_services.html',
+        services=services,
+        category=category,
+        location=location,
+        max_price=max_price,
+        search=search
+    )
+
+
+@app.route('/paid-services/post', methods=['GET', 'POST'])
+@login_required
+def post_paid_service():
+    if request.method == 'POST':
+        service = PaidService(
+            provider_id=current_user.id,
+            title=request.form['title'],
+            description=request.form['description'],
+            category=request.form['category'],
+            price=float(request.form['price']),
+            location=request.form['location'],
+            availability=request.form['availability'],
+            duration=request.form['duration']
+        )
+        db.session.add(service)
+        db.session.commit()
+        flash('Paid service listed successfully!', 'success')
+        return redirect(url_for('paid_services'))
+    return render_template('post_paid_service.html')
+
+
+@app.route('/paid-services/<int:id>')
+def view_paid_service(id):
+    service = db.session.get(PaidService, id)
+    if not service:
+        flash('Service not found.', 'danger')
+        return redirect(url_for('paid_services'))
+    reviews = Review.query.filter_by(reviewee_id=service.provider_id).all()
+    avg_rating = round(sum(r.rating for r in reviews) / len(reviews), 1) if reviews else 0
+    return render_template('view_paid_service.html',
+        service=service,
+        reviews=reviews,
+        avg_rating=avg_rating
+    )
+
+
+@app.route('/paid-services/<int:id>/book', methods=['GET', 'POST'])
+@login_required
+def book_service(id):
+    service = db.session.get(PaidService, id)
+    if not service:
+        flash('Service not found.', 'danger')
+        return redirect(url_for('paid_services'))
+    if service.provider_id == current_user.id:
+        flash('You cannot book your own service.', 'danger')
+        return redirect(url_for('view_paid_service', id=id))
+    if request.method == 'POST':
+        booking = PaidBooking(
+            service_id=service.id,
+            customer_id=current_user.id,
+            booking_date=request.form['booking_date'],
+            notes=request.form.get('notes', '')
+        )
+        db.session.add(booking)
+        db.session.commit()
+        flash('Booking request sent! Wait for provider to accept.', 'success')
+        return redirect(url_for('my_bookings'))
+    return render_template('book_service.html', service=service)
+
+
+@app.route('/my-bookings')
+@login_required
+def my_bookings():
+    # Bookings I made as customer
+    as_customer = PaidBooking.query.filter_by(
+        customer_id=current_user.id
+    ).order_by(PaidBooking.created_at.desc()).all()
+
+    # Bookings I received as provider
+    my_services = PaidService.query.filter_by(provider_id=current_user.id).all()
+    service_ids = [s.id for s in my_services]
+    as_provider = PaidBooking.query.filter(
+        PaidBooking.service_id.in_(service_ids)
+    ).order_by(PaidBooking.created_at.desc()).all() if service_ids else []
+
+    return render_template('my_bookings.html',
+        as_customer=as_customer,
+        as_provider=as_provider
+    )
+
+
+@app.route('/bookings/<int:id>/accept')
+@login_required
+def accept_booking(id):
+    booking = db.session.get(PaidBooking, id)
+    if booking and booking.service.provider_id == current_user.id:
+        booking.status = 'accepted'
+        db.session.commit()
+        flash('Booking accepted!', 'success')
+    return redirect(url_for('my_bookings'))
+
+
+@app.route('/bookings/<int:id>/complete')
+@login_required
+def complete_booking(id):
+    booking = db.session.get(PaidBooking, id)
+    if booking and booking.service.provider_id == current_user.id:
+        booking.status = 'completed'
+        booking.payment_status = 'completed'
+        booking.completed_at = datetime.utcnow()
+        db.session.commit()
+        flash('Booking marked as completed!', 'success')
+    return redirect(url_for('my_bookings'))
+
+
+@app.route('/bookings/<int:id>/cancel')
+@login_required
+def cancel_booking(id):
+    booking = db.session.get(PaidBooking, id)
+    if booking and (booking.customer_id == current_user.id or
+                    booking.service.provider_id == current_user.id):
+        booking.status = 'cancelled'
+        db.session.commit()
+        flash('Booking cancelled.', 'danger')
+    return redirect(url_for('my_bookings'))
+
+
+@app.route('/paid-services/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_paid_service(id):
+    service = db.session.get(PaidService, id)
+    if not service or service.provider_id != current_user.id:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('paid_services'))
+    if request.method == 'POST':
+        service.title = request.form['title']
+        service.description = request.form['description']
+        service.category = request.form['category']
+        service.price = float(request.form['price'])
+        service.location = request.form['location']
+        service.availability = request.form['availability']
+        service.duration = request.form['duration']
+        db.session.commit()
+        flash('Service updated!', 'success')
+        return redirect(url_for('view_paid_service', id=service.id))
+    return render_template('edit_paid_service.html', service=service)
+
+
+@app.route('/paid-services/<int:id>/delete')
+@login_required
+def delete_paid_service(id):
+    service = db.session.get(PaidService, id)
+    if not service or service.provider_id != current_user.id:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('paid_services'))
+    db.session.delete(service)
+    db.session.commit()
+    flash('Service deleted.', 'success')
+    return redirect(url_for('paid_services'))
 
 # ── Run ──────────────────────────────────────────────────
 if __name__ == '__main__':

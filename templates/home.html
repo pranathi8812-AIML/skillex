@@ -3,6 +3,43 @@
 
 {% block content %}
 
+{% block content %}
+
+<!-- Mode Selector -->
+<section class="mode-selector">
+  <div class="mode-cards">
+
+    <a href="{{ url_for('board') }}" class="mode-card mode-credit">
+      <div class="mode-icon">
+        <i class="fa-solid fa-arrows-rotate"></i>
+      </div>
+      <div class="mode-info">
+        <h2>Exchange Skills</h2>
+        <p>Exchange your skills without money using community credits. Help others, earn credits, get help back.</p>
+        <span class="mode-btn credit-btn">
+          <i class="fa-solid fa-coins"></i> Explore Skill Exchange
+        </span>
+      </div>
+      <div class="mode-badge credit-badge">FREE</div>
+    </a>
+
+    <a href="{{ url_for('paid_services') }}" class="mode-card mode-paid">
+      <div class="mode-icon paid-icon">
+        <i class="fa-solid fa-handshake-simple"></i>
+      </div>
+      <div class="mode-info">
+        <h2>Hire Nearby Help</h2>
+        <p>Need urgent help? Hire trusted neighbours at affordable prices. Perfect if you're new or need help fast.</p>
+        <span class="mode-btn paid-btn">
+          <i class="fa-solid fa-indian-rupee-sign"></i> Find Paid Services
+        </span>
+      </div>
+      <div class="mode-badge paid-badge">AFFORDABLE</div>
+    </a>
+
+  </div>
+</section>
+
 <!-- Hero Section -->
 <section class="hero">
   <div class="hero-content">

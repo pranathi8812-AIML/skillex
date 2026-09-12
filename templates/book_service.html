@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Book {{ service.title }}{% endblock %}
+{% block page_icon %}<i class="fa-solid fa-calendar-check"></i>{% endblock %}
+{% block page_title %}Book Service{% endblock %}
+{% block page_subtitle %}Confirm your booking request for {{ service.title }}.{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+  <div class="auth-card wide-card">
+    <div class="auth-header">
+      <i class="fa-solid fa-calendar-check" style="color:#10b981"></i>
+      <h2>Confirm Booking</h2>
+      <p>{{ service.title }} — <strong style="color:#10b981">₹{{ service.price }}</strong></p>
+    </div>
+
+    <!-- Service Summary -->
+    <div class="booking-summary">
+      <div class="booking-summary-row">
+        <span>Provider</span>
+        <strong>{{ service.provider.name }}</strong>
+      </div>
+      <div class="booking-summary-row">
+        <span>Location</span>
+        <strong>{{ service.location }}</strong>
+      </div>
+      <div class="booking-summary-row">
+        <span>Duration</span>
+        <strong>{{ service.duration }}</strong>
+      </div>
+      <div class="booking-summary-row">
+        <span>Availability</span>
+        <strong>{{ service.availability }}</strong>
+      </div>
+      <div class="booking-summary-row total-row">
+        <span>Total Amount</span>
+        <strong style="color:#10b981;font-size:1.2rem;">₹{{ service.price }}</strong>
+      </div>
+    </div>
+
+    <form method="POST">
+      <div class="form-group">
+        <label>Preferred Date & Time</label>
+        <input type="text" name="booking_date"
+               placeholder="e.g. 28 June 2026, 10:00 AM" required/>
+      </div>
+      <div class="form-group">
+        <label>Additional Notes <span class="hint">(optional)</span></label>
+        <textarea name="notes" rows="3"
+                  placeholder="Any specific requirements or instructions for the provider..."></textarea>
+      </div>
+
+      <div class="booking-note">
+        <i class="fa-solid fa-circle-info"></i>
+        Payment will be made directly to the provider after service completion.
+        This is a community platform — please be respectful and responsible.
+      </div>
+
+      <button type="submit" class="paid-btn-primary paid-btn-full">
+        <i class="fa-solid fa-check"></i> Send Booking Request
+      </button>
+      <a href="{{ url_for('view_paid_service', id=service.id) }}"
+         class="btn-outline paid-btn-full" style="margin-top:0.8rem;display:flex;justify-content:center;">
+        Cancel
+      </a>
+    </form>
+  </div>
+</section>
+{% endblock %}

@@ -84,3 +84,34 @@ class MessageRequest(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_requests')
     receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_requests')
+
+
+    class PaidService(db.Model):
+    __tablename__ = 'paid_service'
+    id = db.Column(db.Integer, primary_key=True)
+    provider_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    title = db.Column(db.String(150), nullable=False)
+    description = db.Column(db.String(1000), nullable=False)
+    category = db.Column(db.String(50), nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    location = db.Column(db.String(100), nullable=False)
+    availability = db.Column(db.String(200), nullable=False)
+    duration = db.Column(db.String(100), nullable=False)
+    status = db.Column(db.String(20), default='active')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    provider = db.relationship('User', foreign_keys=[provider_id], backref='paid_services')
+    bookings = db.relationship('PaidBooking', backref='service', lazy=True)
+
+
+class PaidBooking(db.Model):
+    __tablename__ = 'paid_booking'
+    id = db.Column(db.Integer, primary_key=True)
+    service_id = db.Column(db.Integer, db.ForeignKey('paid_service.id'), nullable=False)
+    customer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    booking_date = db.Column(db.String(100), nullable=False)
+    status = db.Column(db.String(20), default='pending')
+    payment_status = db.Column(db.String(20), default='pending')
+    notes = db.Column(db.String(500), default='')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    completed_at = db.Column(db.DateTime, nullable=True)
+    customer = db.relationship('User', foreign_keys=[customer_id], backref='bookings_made')

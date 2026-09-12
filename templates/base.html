@@ -31,6 +31,15 @@
         {% endif %}
       </a>
 
+      <a href="{{ url_for('paid_services') }}" class="nav-paid-link">
+  <i class="fa-solid fa-indian-rupee-sign"></i> Hire Help
+</a>
+{% if current_user.is_authenticated %}
+<a href="{{ url_for('my_bookings') }}" class="nav-notif-wrap">
+  <i class="fa-solid fa-calendar"></i> Bookings
+</a>
+{% endif %}
+
       <a href="{{ url_for('notifications') }}" class="nav-notif-wrap">
   <i class="fa-solid fa-bell"></i>
   {% if total_notifications > 0 %}
@@ -67,8 +76,19 @@
 {% endwith %}
 
   <main>
-    {% block content %}{% endblock %}
-  </main>
+  {% if self.page_title() %}
+  <div class="page-title-bar">
+    <div class="page-title-inner">
+      {% block page_icon %}<i class="fa-solid fa-house"></i>{% endblock %}
+      <div>
+        <h1 class="page-title">{% block page_title %}{% endblock %}</h1>
+        <p class="page-subtitle">{% block page_subtitle %}{% endblock %}</p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  {% block content %}{% endblock %}
+</main>
 
   <footer class="footer">
    <p>© 2026 <span>Skillex</span> — Hyperlocal Skill & Labour Exchange Platform. Built for communities.</p> 
